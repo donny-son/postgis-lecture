@@ -23,6 +23,10 @@
         .sidebar {
             background-color: #F5F5F5; /* neutral-100 for slight contrast */
             border-right: 1px solid #E5E5E5; /* neutral-300 */
+            transition: transform 0.3s ease;
+        }
+        .sidebar.mobile-hidden {
+            /* Transform only applied on mobile via media query */
         }
         .nav-link {
             color: #065F46; /* emerald-700 */
@@ -77,6 +81,10 @@
             background-color: #E5E5E5; /* neutral-200 */
             color: #065F46; /* emerald-700 */
         }
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         pre {
             background-color: #F3F4F6; /* gray-100 */
             color: #1F2937; /* gray-800 */
@@ -84,6 +92,7 @@
             border-radius: 0.375rem;
             overflow-x: auto;
             position: relative;
+            font-size: 0.875rem;
         }
         .copy-btn {
             position: absolute;
@@ -124,6 +133,7 @@
             padding: 0.5rem 1rem;
             border-radius: 0.375rem 0.375rem 0 0;
             font-weight: 500;
+            font-size: 0.875rem;
         }
         .tab-button.active {
             background-color: #065F46; /* emerald-700 */
@@ -215,28 +225,116 @@
         .answer-content strong {
             color: #065F46; /* emerald-700 */
         }
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+        }
+        .mobile-overlay.show {
+            display: block;
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: #065F46;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            .sidebar {
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+                width: 16rem;
+            }
+            .sidebar.mobile-hidden {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+            .mobile-header {
+                display: block;
+            }
+            .tab-button {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.75rem;
+            }
+            .quiz-question-container {
+                padding: 1rem;
+            }
+            h1.text-3xl {
+                font-size: 1.5rem;
+            }
+            h2.text-2xl {
+                font-size: 1.25rem;
+            }
+            h3.text-xl {
+                font-size: 1.125rem;
+            }
+        }
+        @media (min-width: 769px) {
+            .mobile-header {
+                display: none;
+            }
+            .sidebar {
+                position: fixed;
+                transform: translateX(0) !important;
+            }
+            .main-content {
+                margin-left: 16rem;
+            }
+        }
     </style>
 </head>
-<body class="flex h-screen">
+<body class="min-h-screen">
+    <!-- Mobile Header -->
+    <div class="mobile-header bg-white border-b border-neutral-200 p-4 md:hidden">
+        <div class="flex items-center justify-between">
+            <h1 class="text-lg font-bold text-emerald-800">PostGIS Lecture</h1>
+            <button class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
 
-    <aside class="sidebar w-64 min-h-screen p-4 space-y-2 fixed top-0 left-0 h-full overflow-y-auto">
-        <h1 class="text-xl font-bold mb-6 text-center text-emerald-800">PostGIS Lecture</h1>
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
+
+    <aside class="sidebar w-64 min-h-screen p-4 space-y-2 fixed top-0 left-0 h-full overflow-y-auto mobile-hidden md:transform-none" id="sidebar">
+        <h1 class="text-xl font-bold mb-6 text-center text-emerald-800 hidden md:block">PostGIS Lecture</h1>
         <nav>
-            <a href="#overview" class="nav-link block py-2 px-4 rounded-md">Overview</a>
-            <a href="#why-spatial-db" class="nav-link block py-2 px-4 rounded-md">Why Spatial Databases?</a>
-            <a href="#postgis-basics" class="nav-link block py-2 px-4 rounded-md">PostGIS Fundamentals</a>
-            <a href="#connecting" class="nav-link block py-2 px-4 rounded-md">Connecting & Querying</a>
-            <a href="#use-cases" class="nav-link block py-2 px-4 rounded-md">Real-World Applications</a>
-            <a href="#pop-quiz" class="nav-link block py-2 px-4 rounded-md">Pop Quiz</a>
-            <a href="#summary-resources" class="nav-link block py-2 px-4 rounded-md">Summary & Resources</a>
+            <a href="#overview" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Overview</a>
+            <a href="#why-spatial-db" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Why Spatial Databases?</a>
+            <a href="#postgis-basics" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">PostGIS Fundamentals</a>
+            <a href="#connecting" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Connecting & Querying</a>
+            <a href="#use-cases" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Real-World Applications</a>
+            <a href="#pop-quiz" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Pop Quiz</a>
+            <a href="#summary-resources" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Summary & Resources</a>
         </nav>
     </aside>
 
-    <main class="flex-1 p-8 ml-64 overflow-y-auto">
+    <main class="main-content flex-1 p-4 md:p-8 pt-20 md:pt-8 overflow-y-auto">
         <section id="overview" class="content-section">
             <h1 class="text-3xl font-bold mb-4">Introduction to Spatial Databases (PostGIS) for Public Health Research</h1>
-            <p class="text-lg text-neutral-700 mb-2">Welcome! This interactive application explores the concepts and benefits of using PostGIS spatial databases in public health research. It's designed for researchers who may have limited prior experience with databases or programming but are familiar with public health data.</p>
-            <p class="text-neutral-600">Navigate through the sections using the sidebar to learn about why spatial databases are crucial, understand PostGIS basics, see how to connect using R and Python, explore real-world use cases, test your knowledge with a pop quiz, and find resources for further learning.</p>
+            <p class="text-base md:text-lg text-neutral-700 mb-2">Welcome! This interactive application explores the concepts and benefits of using PostGIS spatial databases in public health research. It's designed for researchers who may have limited prior experience with databases or programming but are familiar with public health data.</p>
+            <p class="text-sm md:text-base text-neutral-600">Navigate through the sections using the sidebar to learn about why spatial databases are crucial, understand PostGIS basics, see how to connect using R and Python, explore real-world use cases, test your knowledge with a pop quiz, and find resources for further learning.</p>
             <div class="key-takeaway">
                 <p><strong>Overall Goal:</strong> To introduce the concept and benefits of using PostGIS spatial databases in public health research and demonstrate basic data access using R and Python.</p>
             </div>
@@ -294,7 +392,7 @@
             <p class="mt-4">These limitations can undermine research quality, reproducibility, and collaboration. Relational databases (like PostgreSQL) and specialized spatial databases (like PostGIS, an extension for PostgreSQL) address these challenges.</p>
             
             <h3 class="text-xl font-semibold mt-6">Summary of Challenges: Traditional vs. Database Approach</h3>
-            <div class="overflow-x-auto">
+            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
@@ -364,7 +462,7 @@
             
             <h3 class="text-xl font-semibold mt-4">1. Geometry Types</h3>
             <p>PostGIS stores geographic features as specific geometry types. Click each type to see examples:</p>
-            <div class="grid md:grid-cols-3 gap-4 mt-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 <div id="geom-point" class="interactive-card p-4 rounded-lg shadow">
                     <h4 class="text-lg font-semibold text-center">Point <span class="text-2xl">📍</span></h4>
                     <div class="interactive-card-content text-sm">
@@ -404,13 +502,13 @@
             </ul>
             <div class="p-4 border border-dashed border-neutral-400 rounded-md mt-2 bg-white">
                 <p class="font-semibold text-center">Conceptual Visualization: SRID Alignment</p>
-                <div class="flex justify-around items-center mt-2 text-sm">
+                <div class="flex flex-col md:flex-row justify-around items-center mt-2 text-sm space-y-2 md:space-y-0">
                     <div class="text-center">
                         <p class="text-red-500">Layer A (SRID: X)</p>
                         <p class="text-blue-500">Layer B (SRID: Y)</p>
                         <p class="mt-1"><strong>Misaligned!</strong> 🚫</p>
                     </div>
-                    <div class="text-2xl mx-4">➡️</div>
+                    <div class="text-2xl">➡️</div>
                     <div class="text-center">
                         <p class="text-green-600">Layer A (Transformed to SRID: Z)</p>
                         <p class="text-green-600">Layer B (Transformed to SRID: Z)</p>
@@ -452,7 +550,7 @@
             </div>
 
             <div class="mt-6">
-                <div class="flex border-b border-neutral-300">
+                <div class="flex flex-col md:flex-row border-b border-neutral-300">
                     <button class="tab-button py-2 px-4 active" onclick="openTab(event, 'r-code')">Using R with PostGIS</button>
                     <button class="tab-button py-2 px-4" onclick="openTab(event, 'python-code')">Using Python with PostGIS</button>
                 </div>
@@ -558,7 +656,7 @@ print(health_data_gdf.head())
             <h1 class="text-3xl font-bold mb-4">Real-World Applications</h1>
             <p class="mb-4 text-neutral-700">This section explores common public health scenarios where PostGIS and its spatial SQL capabilities can answer specific research questions, moving beyond simple mapping to sophisticated spatial epidemiology.</p>
 
-            <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="p-6 bg-white rounded-xl shadow-lg">
                     <h3 class="text-xl font-semibold mb-2">Use Case 1: Disease Surveillance & Cluster Analysis</h3>
                     <p class="text-sm text-neutral-600 mb-1"><strong>Question:</strong> Where are disease cases concentrated? Are there more cases in District A vs. B (accounting for population)?</p>
@@ -704,22 +802,22 @@ print(health_data_gdf.head())
             <p>To continue your learning journey:</p>
             <h3 class="text-xl font-semibold mt-4">Official Websites:</h3>
             <ul class="list-disc list-inside ml-4 my-2">
-                <li>PostGIS: <a href="https://postgis.net" target="_blank" class="resource-link">postgis.net</a></li>
-                <li>PostgreSQL: <a href="https://postgresql.org" target="_blank" class="resource-link">postgresql.org</a></li>
+                <li>PostGIS: <a href="https://postgis.net" target="_blank" rel="noopener" class="resource-link">postgis.net</a></li>
+                <li>PostgreSQL: <a href="https://postgresql.org" target="_blank" rel="noopener" class="resource-link">postgresql.org</a></li>
             </ul>
 
             <h3 class="text-xl font-semibold mt-4">Key R Packages Documentation:</h3>
             <ul class="list-disc list-inside ml-4 my-2">
-                <li>`sf` (Simple Features): <a href="https://r-spatial.github.io/sf/" target="_blank" class="resource-link">r-spatial.github.io/sf/</a></li>
-                <li>`DBI` (DataBase Interface): <a href="https://dbi.r-dbi.org" target="_blank" class="resource-link">dbi.r-dbi.org</a></li>
-                <li>`RPostgres`: <a href="https://rpostgres.r-dbi.org" target="_blank" class="resource-link">rpostgres.r-dbi.org</a></li>
+                <li>`sf` (Simple Features): <a href="https://r-spatial.github.io/sf/" target="_blank" rel="noopener" class="resource-link">r-spatial.github.io/sf/</a></li>
+                <li>`DBI` (DataBase Interface): <a href="https://dbi.r-dbi.org" target="_blank" rel="noopener" class="resource-link">dbi.r-dbi.org</a></li>
+                <li>`RPostgres`: <a href="https://rpostgres.r-dbi.org" target="_blank" rel="noopener" class="resource-link">rpostgres.r-dbi.org</a></li>
             </ul>
 
             <h3 class="text-xl font-semibold mt-4">Key Python Packages Documentation:</h3>
             <ul class="list-disc list-inside ml-4 my-2">
-                <li>`geopandas`: <a href="https://geopandas.org" target="_blank" class="resource-link">geopandas.org</a></li>
-                <li>`SQLAlchemy`: <a href="https://sqlalchemy.org" target="_blank" class="resource-link">sqlalchemy.org</a></li>
-                <li>`psycopg2` (PostgreSQL adapter): <a href="https://www.psycopg.org/docs/" target="_blank" class="resource-link">psycopg.org/docs/</a> (psycopg2/3)</li>
+                <li>`geopandas`: <a href="https://geopandas.org" target="_blank" rel="noopener" class="resource-link">geopandas.org</a></li>
+                <li>`SQLAlchemy`: <a href="https://sqlalchemy.org" target="_blank" rel="noopener" class="resource-link">sqlalchemy.org</a></li>
+                <li>`psycopg2` (PostgreSQL adapter): <a href="https://www.psycopg.org/docs/" target="_blank" rel="noopener" class="resource-link">psycopg.org/docs/</a> (psycopg2/3)</li>
             </ul>
 
             <h3 class="text-xl font-semibold mt-4">General Tutorial Search Terms:</h3>
@@ -837,6 +935,22 @@ print(health_data_gdf.head())
                  });
             }
         }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            sidebar.classList.toggle('mobile-hidden');
+            overlay.classList.toggle('show');
+        }
+
+        function closeMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            sidebar.classList.add('mobile-hidden');
+            overlay.classList.remove('show');
+        }
         
         function initializePage() {
             const currentHash = window.location.hash || '#overview';
@@ -853,6 +967,26 @@ print(health_data_gdf.head())
         
         document.addEventListener('DOMContentLoaded', initializePage);
         window.addEventListener('hashchange', initializePage);
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const hamburger = document.querySelector('.hamburger');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !hamburger.contains(event.target) && 
+                !sidebar.classList.contains('mobile-hidden')) {
+                closeMobileMenu();
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeMobileMenu();
+            }
+        });
 
     </script>
 </body>
