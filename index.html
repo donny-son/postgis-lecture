@@ -1038,6 +1038,70 @@ Write one SQL query that returns each district's name, case count, and cases per
                 </div>
             </div>
 
+            <h2 class="text-2xl font-semibold mt-6">Emerging generative-AI applications in the field <span class="badge-new">New</span></h2>
+            <p>Beyond chat assistants, generative AI is showing up <em>inside</em> the geospatial workflow. These are real, active areas in 2026 — useful to know about even if you don't use all of them yet. Click a card to expand.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">🛰️ Geospatial foundation models for imagery</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Models like <strong>Prithvi</strong> (NASA–IBM, trained on Landsat/Sentinel-2 and now even running in orbit) and <strong>Clay</strong> turn satellite/aerial imagery into ready-to-use features for flood mapping, burn-scar detection, land-use and cloud-gap reconstruction — with little to no manual feature engineering.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> environmental-exposure assessment, disaster response, monitoring flooding/heat/air-quality drivers of disease.</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">✂️ Promptable feature extraction (SAM-for-geo)</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Segment-Anything-style models (e.g., <code>segment-geospatial</code>/<code>samgeo</code>) let you extract buildings, water bodies, fields, or roads from imagery with a click or a text prompt — no hand-digitizing.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> rapidly mapping settlements/buildings for population denominators, sanitation, or access studies in data-poor regions.</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">💬 "Chat with your map / database"</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>QGIS LLM plugins (<strong>GeoAgent, Promptly, IntelliGeo, Whitebox AI Agent</strong>) and MCP/text-to-SQL tools let you describe an operation in plain language; the AI inspects your layers/CRS/schema and generates the geoprocessing or SQL to run it.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> lowers the barrier for epidemiologists to run spatial analyses without deep GIS/SQL skills (still verify the output!).</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">🧪 Synthetic &amp; privacy-preserving data</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Generative models can produce <strong>synthetic populations or case locations</strong> that preserve realistic spatial distributions without exposing real individuals — for sharing, teaching, or method development.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> collaborate and publish reproducible spatial methods while protecting PHI; build demos without real patient data.</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">📍 Geocoding, parsing &amp; record linkage</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>LLMs are strong at cleaning messy addresses, standardizing place names, parsing free-text locations from clinical notes, and matching records across datasets that lack a shared key.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> turning inconsistent surveillance/EHR address fields into mappable, linkable data (do this on de-identified data in approved environments).</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">🔎 Semantic + spatial search (embeddings)</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>With <code>pgvector</code> inside PostgreSQL/PostGIS you can combine <strong>vector embeddings</strong> (semantic similarity) with spatial filters — e.g., "facilities <em>similar to</em> X <em>and</em> within 10 km" — in a single database.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> retrieval-augmented analysis over reports/facilities, smarter matching of services to needs.</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">🤝 Agentic analysis copilots</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Coding agents (e.g., Claude Code, Cursor) now read your files, write and run spatial code, inspect results, and iterate end-to-end — turning a research question into a reproducible pipeline with you supervising.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> faster, more reproducible analyses; great for prototyping a study workflow before scaling it.</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">🗺️ AI cartography &amp; narrative reporting</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Generative tools assist with map styling, choosing classifications/color schemes, and drafting plain-language summaries of spatial results for briefs and dashboards.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> communicating findings to decision-makers and the public quickly — with a human checking accuracy and avoiding misleading maps.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="caution">
+                <p><strong>⚠️ Same rules apply:</strong> these applications are powerful but not infallible. Foundation-model outputs need ground-truthing, LLM-generated code and SQL need verification, and <strong>none of them excuse putting real PHI into unapproved tools.</strong> Treat AI output as a draft to validate, not a result to publish.</p>
+            </div>
+
             <div class="key-takeaway mt-6">
                 <p><strong>Key takeaway:</strong> Generative AI dramatically lowers the barrier to learning and doing GIS — as a tutor, code translator, debugger, and analysis copilot. Get the most from it by giving rich context (versions, schema, SRIDs), asking for explanations, and verifying every result. And never trade your participants' privacy for convenience: share structure, not sensitive data.</p>
             </div>
@@ -1219,6 +1283,14 @@ Write one SQL query that returns each district's name, case count, and cases per
                 <li>Always state your <strong>tool + version</strong> (e.g., "PostGIS 3.6, PostgreSQL 18") and your <strong>schema + SRIDs</strong> in prompts.</li>
                 <li><strong>Verify</strong> AI-suggested function names against the official PostGIS reference, and check the <strong>units</strong> of any distance/area result.</li>
                 <li><strong>Privacy:</strong> never paste PHI/PII or precise patient coordinates into AI tools — share structure and synthetic examples, follow your institution's data policy, and prefer approved/enterprise or local models near sensitive data.</li>
+            </ul>
+            <p class="mt-2 text-sm text-neutral-600">Emerging GenAI-in-geospatial to explore:</p>
+            <ul class="list-disc list-inside ml-4 my-2">
+                <li>Prithvi geospatial foundation model: <a href="https://huggingface.co/ibm-nasa-geospatial" target="_blank" rel="noopener" class="resource-link">ibm-nasa-geospatial (Hugging Face)</a></li>
+                <li>Clay foundation model: <a href="https://madewithclay.org" target="_blank" rel="noopener" class="resource-link">madewithclay.org</a></li>
+                <li>segment-geospatial (SAM for imagery): <a href="https://samgeo.gishub.org" target="_blank" rel="noopener" class="resource-link">samgeo.gishub.org</a></li>
+                <li>QGIS LLM plugins (GeoAgent, Promptly, IntelliGeo): <a href="https://plugins.qgis.org/plugins/tags/natural-language/" target="_blank" rel="noopener" class="resource-link">QGIS natural-language plugins</a></li>
+                <li>pgvector (embeddings in PostgreSQL): <a href="https://github.com/pgvector/pgvector" target="_blank" rel="noopener" class="resource-link">github.com/pgvector/pgvector</a></li>
             </ul>
 
             <h3 class="text-xl font-semibold mt-4">General Tutorial Search Terms:</h3>
