@@ -3,310 +3,680 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Lecture: PostGIS for Public Health Research</title>
+    <title>Interactive Lecture: PostGIS &amp; AI-Assisted GIS for Public Health Research</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+      // Hallmark · custom almanac theme — remap Tailwind palette to warm field-guide tokens
+      // so the existing utility classes (emerald/neutral/white/…) adopt the new system.
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Newsreader', 'Georgia', 'serif'],
+              serif: ['Newsreader', 'Georgia', 'serif'],
+              display: ['Fraunces', 'Georgia', 'serif'],
+              mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+            },
+            colors: {
+              emerald: {
+                50: 'var(--color-green-tint)', 100: 'var(--color-green-tint-2)', 300: 'var(--color-green-soft)',
+                500: 'var(--color-green)', 600: 'var(--color-green)', 700: 'var(--color-green-deep)', 800: 'var(--color-green-deep)',
+              },
+              neutral: {
+                100: 'var(--color-paper-2)', 200: 'var(--color-paper-3)', 300: 'var(--color-rule)', 400: 'var(--color-rule-strong)',
+                500: 'var(--color-ink-faint)', 600: 'var(--color-ink-soft)', 700: 'var(--color-ink-soft)', 800: 'var(--color-ink)', 900: 'var(--color-ink)',
+              },
+              gray: {
+                50: 'var(--color-paper-2)', 100: 'var(--color-paper-3)', 200: 'var(--color-rule)', 300: 'var(--color-rule)',
+                800: 'var(--color-ink-soft)', 900: 'var(--color-ink)',
+              },
+              red: { 50: 'var(--color-brick-tint)', 200: 'var(--color-brick-soft)', 500: 'var(--color-brick)', 600: 'var(--color-brick-deep)', 700: 'var(--color-brick-deep)' },
+              blue: { 50: 'var(--color-blue-tint)', 500: 'var(--color-blue)', 700: 'var(--color-blue-deep)' },
+              green: { 50: 'var(--color-green-tint)', 200: 'var(--color-green-soft)', 600: 'var(--color-green)', 700: 'var(--color-green-deep)' },
+              indigo: { 50: 'var(--color-gold-tint)', 200: 'var(--color-gold-soft)', 500: 'var(--color-gold)', 600: 'var(--color-gold-deep)', 700: 'var(--color-gold-deep)' },
+              amber: { 50: 'var(--color-paper)' },
+              white: 'var(--color-card)',
+            },
+          },
+        },
+      };
+    </script>
     <!-- Visualization & Content Choices:
         - Limitations Table (Part 1): HTML table. Goal: Compare. Interaction: Static. Justification: Clear side-by-side comparison.
         - Geometry Types (Part 2): HTML/CSS cards. Goal: Inform/Organize. Interaction: Click to reveal details/examples for Point, Line, Polygon. Justification: Interactive learning of core concepts.
         - SRID Concept (Part 2): HTML/CSS visual placeholder. Goal: Inform. Interaction: Static visual description. Justification: Illustrate alignment concept.
         - R/Python Code (Part 3): HTML `<pre>` blocks with JS for copy. Goal: Inform/Provide. Interaction: Copy button. Justification: Easy access to usable code.
         - Use Cases (Part 4): HTML/CSS cards with text-based "map" descriptions. Goal: Illustrate. Interaction: Static, clear presentation of examples. Justification: Show practical application.
-        - Pop Quiz (New): HTML structure for 5 MCQs. Goal: Assess/Reinforce. Interaction: Click "Show Answer" button to reveal correct answer and rationale for each question. Justification: Active recall and self-assessment of key lecture points.
+        - Pop Quiz: HTML structure for MCQs. Goal: Assess/Reinforce. Interaction: Click "Show Answer" button to reveal correct answer and rationale for each question. Justification: Active recall and self-assessment of key lecture points.
+        - Modern GIS Stack (2026 revamp): HTML/CSS cards + comparison table. Goal: Update field knowledge. Interaction: Static + interactive cards. Justification: Reflect cloud-native geospatial, DuckDB, GeoParquet, current versions.
+        - Learning GIS with Generative AI (2026 revamp): Prompt-template boxes with copy buttons, workflow steps, caution callouts. Goal: Teach AI-assisted learning & analysis. Interaction: Copy-able prompts, interactive cards. Justification: Core new pedagogical goal of the revamp.
         - NO SVG/Mermaid used. All visuals are HTML/CSS based or textual descriptions. Chart.js/Plotly.js not required as the source material is textual/conceptual. -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #FFFAF0; /* bg-amber-50 */
-            color: #262626; /* text-neutral-800 */
-        }
-        .sidebar {
-            background-color: #F5F5F5; /* neutral-100 for slight contrast */
-            border-right: 1px solid #E5E5E5; /* neutral-300 */
-            transition: transform 0.3s ease;
-        }
-        .sidebar.mobile-hidden {
-            /* Transform only applied on mobile via media query */
-        }
-        .nav-link {
-            color: #065F46; /* emerald-700 */
-            transition: all 0.3s ease;
-        }
-        .nav-link:hover, .nav-link.active {
-            background-color: #D1FAE5; /* emerald-100 */
-            color: #047857; /* emerald-600 */
-            border-left: 3px solid #065F46; /* emerald-700 */
-            padding-left: calc(1rem - 3px);
-        }
-        .content-section {
-            display: none;
-        }
-        .content-section.active {
-            display: block;
-        }
-        .key-takeaway {
-            background-color: #ECFDF5; /* emerald-50 */
-            border-left: 4px solid #10B981; /* emerald-500 */
-            padding: 1rem;
-            margin-top: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 0.375rem;
-        }
-        .key-takeaway strong {
-            color: #065F46; /* emerald-700 */
-        }
-        h1, h2, h3 {
-            color: #065F46; /* emerald-700 */
-            margin-bottom: 0.75rem;
-        }
-        h1.text-3xl { /* Specific for main section titles */
-             color: #064E3B; /* emerald-800 */
-             margin-top:0;
-        }
-         h2 { margin-top: 1.5rem; }
-         h3 { margin-top: 1.25rem; }
+    /* Hallmark · macrostructure: Long Document · tone: warm/nostalgic/wholesome · anchor hue: terracotta
+     * theme: custom "vintage almanac" · paper oklch(96.5% 0.02 88) · accent oklch(56% 0.125 42) warm + botanical green
+     * display Fraunces · body Newsreader · mono IBM Plex Mono · axes: light / soft-serif / warm
+     * pre-emit critique: P5 H4 E5 S5 R4 V5
+     */
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-            margin-bottom: 1rem;
+    :root {
+        /* —— paper & ink —— */
+        --color-paper:    oklch(96.5% 0.020 88);   /* warm aged cream */
+        --color-paper-2:  oklch(93.5% 0.024 86);   /* sidebar / deeper cream */
+        --color-paper-3:  oklch(90.5% 0.028 84);   /* panels, table head */
+        --color-card:     oklch(98.2% 0.012 92);   /* warm near-white card */
+        --color-ink:      oklch(28% 0.022 50);     /* espresso */
+        --color-ink-soft: oklch(43% 0.022 52);     /* secondary text */
+        --color-ink-faint:oklch(56% 0.018 54);     /* muted */
+
+        /* —— botanical green (structure / takeaways) —— */
+        --color-green:        oklch(48% 0.085 152);
+        --color-green-deep:   oklch(38% 0.075 152);
+        --color-green-soft:   oklch(80% 0.050 150);
+        --color-green-tint:   oklch(94% 0.030 150);
+        --color-green-tint-2: oklch(90% 0.042 150);
+
+        /* —— terracotta (primary warm accent) —— */
+        --color-clay:      oklch(56% 0.125 42);
+        --color-clay-deep: oklch(48% 0.125 40);
+        --color-clay-soft: oklch(82% 0.060 45);
+        --color-clay-tint: oklch(93% 0.035 50);
+
+        /* —— brick red (caution) —— */
+        --color-brick:      oklch(53% 0.155 30);
+        --color-brick-deep: oklch(45% 0.150 30);
+        --color-brick-soft: oklch(82% 0.070 35);
+        --color-brick-tint: oklch(94% 0.030 35);
+
+        /* —— dusty blue (AI tips) —— */
+        --color-blue:      oklch(52% 0.075 248);
+        --color-blue-deep: oklch(43% 0.080 250);
+        --color-blue-tint: oklch(94% 0.025 245);
+
+        /* —— ochre / gold (prompt cards, badges) —— */
+        --color-gold:      oklch(64% 0.105 75);
+        --color-gold-deep: oklch(52% 0.100 70);
+        --color-gold-soft: oklch(84% 0.070 80);
+        --color-gold-tint: oklch(94% 0.040 82);
+
+        /* —— rules —— */
+        --color-rule:        oklch(82% 0.018 70);
+        --color-rule-strong: oklch(72% 0.022 65);
+
+        /* —— type —— */
+        --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+        --font-body:    'Newsreader', Georgia, serif;
+        --font-mono:    'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+        /* —— space (4pt) —— */
+        --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 1rem;
+        --space-lg: 1.5rem; --space-xl: 2.5rem; --space-2xl: 4rem;
+
+        /* —— motion —— */
+        --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+        --ease-in:  cubic-bezier(0.7, 0, 0.84, 0);
+        --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+        --dur-fast: 140ms; --dur-mid: 280ms; --dur-slow: 560ms;
+
+        --radius-sm: 3px; --radius-md: 6px; --radius-lg: 10px;
+    }
+
+    html, body { overflow-x: clip; }
+
+    body {
+        font-family: var(--font-body);
+        font-optical-sizing: auto;
+        font-size: 1.0625rem;
+        line-height: 1.72;
+        color: var(--color-ink);
+        background-color: var(--color-paper);
+        background-image:
+            radial-gradient(120% 80% at 78% -10%, oklch(98% 0.03 88 / 0.7), transparent 60%),
+            radial-gradient(90% 70% at -10% 110%, var(--color-clay-tint), transparent 55%);
+        background-attachment: fixed;
+        -webkit-font-smoothing: antialiased;
+    }
+    /* faint paper grain */
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0.5;
+        mix-blend-mode: multiply;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+    }
+
+    ::selection { background: var(--color-clay-soft); color: var(--color-ink); }
+
+    /* —— headings —— */
+    h1, h2, h3, h4 {
+        font-family: var(--font-display);
+        font-optical-sizing: auto;
+        color: var(--color-ink);
+        line-height: 1.12;
+        text-wrap: balance;
+        overflow-wrap: anywhere;
+        min-width: 0;
+        margin-bottom: 0.6rem;
+    }
+    h1.text-3xl { /* section title */
+        color: var(--color-ink);
+        font-weight: 600;
+        font-size: clamp(1.7rem, 1.1rem + 2.4vw, 2.7rem);
+        letter-spacing: -0.01em;
+        margin-top: 0;
+        padding-bottom: 0.7rem;
+        border-bottom: 1px solid var(--color-rule);
+    }
+    h1.text-3xl::after { /* small terracotta ornament beneath the rule */
+        content: "✦";
+        display: block;
+        font-family: var(--font-body);
+        font-size: 0.78rem;
+        color: var(--color-clay);
+        margin-top: 0.6rem;
+        margin-bottom: -0.2rem;
+    }
+    h2 { margin-top: 1.6rem; color: var(--color-green-deep); font-weight: 600; }
+    h3 { margin-top: 1.3rem; color: var(--color-ink); font-weight: 600; }
+    h4 { color: var(--color-ink); font-weight: 600; }
+
+    /* drop cap on the welcome paragraph */
+    #overview > p:first-of-type::first-letter {
+        font-family: var(--font-display);
+        font-weight: 600;
+        float: left;
+        font-size: 3.2rem;
+        line-height: 0.78;
+        padding: 0.32rem 0.5rem 0 0;
+        color: var(--color-clay-deep);
+    }
+
+    a { color: var(--color-clay-deep); }
+
+    /* inline code (outside pre) */
+    code {
+        font-family: var(--font-mono);
+        font-size: 0.85em;
+        color: var(--color-clay-deep);
+        background: var(--color-gold-tint);
+        border: 1px solid var(--color-gold-soft);
+        padding: 0.05em 0.34em;
+        border-radius: var(--radius-sm);
+    }
+    pre code { background: none; border: none; color: inherit; padding: 0; font-size: inherit; }
+
+    /* —— sidebar (table of contents) —— */
+    .sidebar {
+        background-color: var(--color-paper-2);
+        border-right: 1px solid var(--color-rule-strong);
+        box-shadow: inset -3px 0 0 var(--color-paper-2), inset -4px 0 0 var(--color-rule);
+        transition: transform var(--dur-mid) var(--ease-out);
+    }
+    .almanac-masthead { text-align: center; padding: 0.5rem 0 0; }
+    .masthead-kicker {
+        font-family: var(--font-body);
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--color-clay);
+    }
+    .masthead-title {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-style: italic;
+        font-size: 1.55rem;
+        line-height: 1.05;
+        color: var(--color-ink);
+        margin: 0.25rem 0 0.3rem;
+    }
+    .masthead-sub {
+        font-family: var(--font-body);
+        font-size: 0.78rem;
+        color: var(--color-ink-soft);
+        line-height: 1.4;
+    }
+    .masthead-rule {
+        margin: 0.85rem auto 0.4rem;
+        color: var(--color-clay);
+        font-size: 0.7rem;
+        letter-spacing: 0.4em;
+        text-align: center;
+    }
+    .toc-label {
+        font-family: var(--font-body);
+        font-size: 0.6rem;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--color-ink-faint);
+        padding: 0 1rem 0.4rem;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+        font-family: var(--font-body);
+        font-size: 0.97rem;
+        color: var(--color-ink-soft);
+        border-left: 3px solid transparent;
+        transition: color var(--dur-fast) var(--ease-out),
+                    background-color var(--dur-fast) var(--ease-out),
+                    border-color var(--dur-fast) var(--ease-out);
+    }
+    .nav-link .nav-num {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 600;
+        color: var(--color-clay);
+        min-width: 1.7rem;
+        text-align: right;
+        flex-shrink: 0;
+    }
+    .nav-link:hover {
+        background-color: var(--color-clay-tint);
+        color: var(--color-ink);
+        border-left-color: var(--color-clay-soft);
+        padding-left: calc(1rem - 0px);
+    }
+    .nav-link.active {
+        background-color: var(--color-clay-tint);
+        color: var(--color-clay-deep);
+        border-left: 3px solid var(--color-clay);
+        padding-left: calc(1rem - 3px);
+        font-weight: 600;
+    }
+    .nav-link.active .nav-num { color: var(--color-clay-deep); }
+
+    /* —— sections —— */
+    .content-section { display: none; }
+    .content-section.active { display: block; animation: rise var(--dur-slow) var(--ease-out) both; }
+    @keyframes rise {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .main-content { max-width: 70rem; }
+
+    /* —— callouts —— */
+    .key-takeaway, .caution, .ai-tip {
+        padding: 1rem 1.1rem;
+        margin: 1.1rem 0;
+        border-radius: var(--radius-md);
+        position: relative;
+    }
+    .key-takeaway {
+        background-color: var(--color-green-tint);
+        border: 1px solid var(--color-green-soft);
+        border-left: 4px solid var(--color-green);
+    }
+    .key-takeaway strong { color: var(--color-green-deep); }
+    .caution {
+        background-color: var(--color-brick-tint);
+        border: 1px solid var(--color-brick-soft);
+        border-left: 4px solid var(--color-brick);
+    }
+    .caution strong { color: var(--color-brick-deep); }
+    .ai-tip {
+        background-color: var(--color-blue-tint);
+        border: 1px solid oklch(86% 0.04 245);
+        border-left: 4px solid var(--color-blue);
+    }
+    .ai-tip strong { color: var(--color-blue-deep); }
+
+    /* —— tables —— */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid var(--color-rule-strong);
+        border-radius: var(--radius-md);
+        margin: 1.1rem 0;
+        background: var(--color-card);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+        border-bottom: 1px solid var(--color-rule);
+        padding: 0.7rem 0.85rem;
+        text-align: left;
+        vertical-align: top;
+    }
+    th {
+        background-color: var(--color-paper-3);
+        color: var(--color-green-deep);
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 0.92rem;
+        border-bottom: 2px solid var(--color-rule-strong);
+    }
+    tbody tr:nth-child(even) { background-color: oklch(95% 0.018 88 / 0.55); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    /* —— code blocks (cozy espresso panel) —— */
+    pre {
+        background-color: var(--color-ink);
+        color: oklch(92% 0.02 88);
+        padding: 1.1rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color-ink);
+        box-shadow: inset 0 0 0 1px oklch(40% 0.03 60 / 0.5);
+        overflow-x: auto;
+        position: relative;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.6;
+    }
+
+    /* —— buttons —— */
+    .copy-btn, .show-answer-btn, .prompt-copy-btn {
+        font-family: var(--font-body);
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: background-color var(--dur-fast) var(--ease-out),
+                    transform var(--dur-fast) var(--ease-out);
+    }
+    .copy-btn {
+        position: absolute;
+        top: 0.55rem; right: 0.55rem;
+        background-color: var(--color-clay);
+        color: oklch(98% 0.01 90);
+        padding: 0.22rem 0.6rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.72rem;
+        letter-spacing: 0.03em;
+    }
+    .copy-btn:hover { background-color: var(--color-clay-deep); }
+    .copy-btn:active { transform: translateY(1px); }
+
+    /* —— interactive cards —— */
+    .interactive-card {
+        background-color: var(--color-card);
+        border: 1px solid var(--color-rule-strong);
+        border-radius: var(--radius-md);
+        padding: 1rem 1.1rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        position: relative;
+        transition: box-shadow var(--dur-mid) var(--ease-out),
+                    border-color var(--dur-mid) var(--ease-out),
+                    transform var(--dur-mid) var(--ease-out);
+    }
+    .interactive-card::after { /* "open" cue */
+        content: "❧";
+        position: absolute;
+        top: 0.85rem; right: 1rem;
+        color: var(--color-clay-soft);
+        font-size: 0.95rem;
+        transition: color var(--dur-fast) var(--ease-out), transform var(--dur-mid) var(--ease-out);
+    }
+    .interactive-card:hover {
+        border-color: var(--color-clay-soft);
+        box-shadow: 0 6px 18px -10px oklch(40% 0.06 50 / 0.5);
+        transform: translateY(-2px);
+    }
+    .interactive-card:hover::after { color: var(--color-clay); }
+    .interactive-card-content {
+        display: none;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px dashed var(--color-rule-strong);
+    }
+
+    /* —— tabs —— */
+    .tab-button {
+        background-color: var(--color-paper-3);
+        color: var(--color-ink-soft);
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--color-rule);
+        border-bottom: none;
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+        font-family: var(--font-display);
+        font-weight: 500;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+    }
+    .tab-button:hover { color: var(--color-clay-deep); }
+    .tab-button.active {
+        background-color: var(--color-green-deep);
+        color: oklch(96% 0.02 88);
+        border-color: var(--color-green-deep);
+    }
+
+    .resource-link {
+        color: var(--color-clay-deep);
+        text-decoration: underline;
+        text-decoration-color: var(--color-clay-soft);
+        text-underline-offset: 2px;
+        transition: text-decoration-color var(--dur-fast) var(--ease-out);
+    }
+    .resource-link:hover { text-decoration-color: var(--color-clay); }
+
+    /* —— tooltip —— */
+    .tooltip { position: relative; display: inline-block; }
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 160px;
+        background-color: var(--color-ink);
+        color: oklch(95% 0.02 88);
+        text-align: center;
+        border-radius: var(--radius-sm);
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -80px;
+        opacity: 0;
+        transition: opacity var(--dur-fast) var(--ease-out);
+    }
+    .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+    /* —— quiz —— */
+    .quiz-question-container {
+        background-color: var(--color-card);
+        border: 1px solid var(--color-rule-strong);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 14px -12px oklch(40% 0.06 50 / 0.5);
+    }
+    .quiz-question-text {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: var(--color-ink);
+        margin-bottom: 1rem;
+    }
+    .quiz-options ul { list-style-type: none; padding-left: 0; }
+    .quiz-options li {
+        background-color: var(--color-paper);
+        border: 1px solid var(--color-rule);
+        padding: 0.7rem 0.85rem;
+        border-radius: var(--radius-sm);
+        margin-bottom: 0.5rem;
+        transition: background-color var(--dur-fast) var(--ease-out);
+    }
+    .quiz-options li.correct-answer-reveal {
+        background-color: var(--color-green-tint);
+        border-color: var(--color-green-soft);
+        font-weight: 600;
+        position: relative;
+    }
+    .quiz-options li.correct-answer-reveal::after {
+        content: "✓";
+        color: var(--color-green-deep);
+        position: absolute; right: 0.85rem; top: 0.7rem;
+        font-weight: 700;
+    }
+    .show-answer-btn {
+        background-color: var(--color-clay);
+        color: oklch(98% 0.01 90);
+        padding: 0.5rem 1.1rem;
+        border-radius: var(--radius-sm);
+        font-weight: 500;
+        margin-top: 1rem;
+    }
+    .show-answer-btn:hover { background-color: var(--color-clay-deep); }
+    .show-answer-btn:active { transform: translateY(1px); }
+    .answer-content {
+        background-color: var(--color-green-tint);
+        border: 1px solid var(--color-green-soft);
+        padding: 1rem;
+        margin-top: 1rem;
+        border-radius: var(--radius-sm);
+    }
+    .answer-content strong { color: var(--color-green-deep); }
+
+    /* —— prompt boxes (recipe cards) —— */
+    .prompt-box {
+        background-color: var(--color-card);
+        border: 1px solid var(--color-gold-soft);
+        border-left: 4px solid var(--color-gold);
+        border-radius: var(--radius-md);
+        padding: 1rem 1rem 1rem 1.25rem;
+        margin: 1.1rem 0;
+        position: relative;
+    }
+    .prompt-box .prompt-label {
+        display: inline-block;
+        font-family: var(--font-body);
+        font-size: 0.66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-gold-deep);
+        background-color: var(--color-gold-tint);
+        border: 1px solid var(--color-gold-soft);
+        padding: 0.15rem 0.5rem;
+        border-radius: var(--radius-sm);
+        margin-bottom: 0.6rem;
+    }
+    .prompt-box .prompt-text {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--color-ink);
+        white-space: pre-wrap;
+        line-height: 1.55;
+    }
+    .prompt-copy-btn {
+        position: absolute;
+        top: 0.75rem; right: 0.75rem;
+        background-color: var(--color-gold-deep);
+        color: oklch(98% 0.01 90);
+        padding: 0.22rem 0.6rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.72rem;
+        border: none;
+    }
+    .prompt-copy-btn:hover { background-color: var(--color-clay-deep); }
+    .prompt-copy-btn:active { transform: translateY(1px); }
+
+    /* —— "new" badge —— */
+    .badge-new {
+        display: inline-block;
+        font-family: var(--font-body);
+        font-size: 0.58rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--color-gold-deep);
+        background-color: var(--color-gold-tint);
+        border: 1px solid var(--color-gold-soft);
+        padding: 0.12rem 0.45rem;
+        border-radius: 999px;
+        vertical-align: middle;
+        margin-left: 0.45rem;
+    }
+
+    /* —— workflow steps —— */
+    .workflow-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.85rem;
+        background-color: var(--color-card);
+        border: 1px solid var(--color-rule-strong);
+        border-radius: var(--radius-md);
+        padding: 1rem 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+    .workflow-step .step-num {
+        flex-shrink: 0;
+        width: 1.85rem;
+        height: 1.85rem;
+        border-radius: 999px;
+        background-color: var(--color-clay);
+        color: oklch(98% 0.01 90);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* —— mobile chrome —— */
+    .mobile-header { background-color: var(--color-paper-2) !important; border-bottom: 1px solid var(--color-rule-strong) !important; }
+    .mobile-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background-color: oklch(28% 0.02 50 / 0.45);
+        z-index: 40;
+    }
+    .mobile-overlay.show { display: block; }
+    .hamburger { display: none; flex-direction: column; cursor: pointer; padding: 0.5rem; }
+    .hamburger span {
+        width: 25px; height: 2px;
+        background-color: var(--color-clay);
+        margin: 3px 0;
+        transition: var(--dur-fast);
+    }
+
+    /* —— focus —— */
+    :focus-visible {
+        outline: 2px solid var(--color-clay);
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+
+    @media (max-width: 768px) {
+        .hamburger { display: flex; }
+        .sidebar { position: fixed; z-index: 50; height: 100vh; width: 16rem; }
+        .sidebar.mobile-hidden { transform: translateX(-100%); }
+        .main-content { margin-left: 0 !important; }
+        .mobile-header { display: block; }
+        .tab-button { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+        .quiz-question-container { padding: 1rem; }
+        #overview > p:first-of-type::first-letter { font-size: 2.6rem; }
+    }
+    @media (min-width: 769px) {
+        .mobile-header { display: none; }
+        .sidebar { position: fixed; transform: translateX(0) !important; }
+        .main-content { margin-left: 16rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.001ms !important;
+            transition-duration: 0.001ms !important;
         }
-        th, td {
-            border: 1px solid #A3A3A3; /* neutral-400 */
-            padding: 0.75rem;
-            text-align: left;
-        }
-        th {
-            background-color: #E5E5E5; /* neutral-200 */
-            color: #065F46; /* emerald-700 */
-        }
-        .table-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        pre {
-            background-color: #F3F4F6; /* gray-100 */
-            color: #1F2937; /* gray-800 */
-            padding: 1rem;
-            border-radius: 0.375rem;
-            overflow-x: auto;
-            position: relative;
-            font-size: 0.875rem;
-        }
-        .copy-btn {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background-color: #10B981; /* emerald-500 */
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .copy-btn:hover {
-            background-color: #059669; /* emerald-600 */
-        }
-        .interactive-card {
-            background-color: white;
-            border: 1px solid #D4D4D4; /* neutral-300 */
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            transition: box-shadow 0.3s;
-        }
-        .interactive-card:hover {
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-        }
-        .interactive-card-content {
-            display: none;
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px dashed #A3A3A3; /* neutral-400 */
-        }
-        .tab-button {
-            background-color: #E5E5E5; /* neutral-200 */
-            color: #065F46; /* emerald-700 */
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem 0.375rem 0 0;
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
-        .tab-button.active {
-            background-color: #065F46; /* emerald-700 */
-            color: white;
-        }
-        .resource-link {
-            color: #059669; /* emerald-600 */
-            text-decoration: underline;
-        }
-        .resource-link:hover {
-            color: #047857; /* emerald-700 */
-        }
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 160px;
-            background-color: #555;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px 0;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -80px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-        .quiz-question-container {
-            background-color: white;
-            border: 1px solid #D1D5DB; /* gray-300 */
-            border-radius: 0.5rem; /* rounded-lg */
-            padding: 1.5rem; /* p-6 */
-            margin-bottom: 1.5rem; /* mb-6 */
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-md */
-        }
-        .quiz-question-text {
-            font-weight: 600; /* font-semibold */
-            color: #111827; /* gray-900 */
-            margin-bottom: 1rem; /* mb-4 */
-        }
-        .quiz-options ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        .quiz-options li {
-            background-color: #F9FAFB; /* gray-50 */
-            border: 1px solid #E5E7EB; /* gray-200 */
-            padding: 0.75rem; /* p-3 */
-            border-radius: 0.375rem; /* rounded-md */
-            margin-bottom: 0.5rem; /* mb-2 */
-        }
-        .quiz-options li.correct-answer-reveal {
-            background-color: #D1FAE5; /* emerald-100 */
-            border-color: #6EE7B7; /* emerald-300 */
-            font-weight: 600;
-        }
-         .quiz-options li.incorrect-answer-reveal {
-            /* Optional: style for incorrect options if needed after reveal */
-        }
-        .show-answer-btn {
-            background-color: #10B981; /* emerald-500 */
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem; /* rounded-md */
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 1rem; /* mt-4 */
-        }
-        .show-answer-btn:hover {
-            background-color: #059669; /* emerald-600 */
-        }
-        .answer-content {
-            background-color: #F0FDF4; /* green-50 */
-            border: 1px solid #A7F3D0; /* green-200 */
-            padding: 1rem; /* p-4 */
-            margin-top: 1rem; /* mt-4 */
-            border-radius: 0.375rem; /* rounded-md */
-        }
-        .answer-content strong {
-            color: #065F46; /* emerald-700 */
-        }
-        .mobile-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 40;
-        }
-        .mobile-overlay.show {
-            display: block;
-        }
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background-color: #065F46;
-            margin: 3px 0;
-            transition: 0.3s;
-        }
-        @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-            .sidebar {
-                position: fixed;
-                z-index: 50;
-                height: 100vh;
-                width: 16rem;
-            }
-            .sidebar.mobile-hidden {
-                transform: translateX(-100%);
-            }
-            .main-content {
-                margin-left: 0 !important;
-            }
-            .mobile-header {
-                display: block;
-            }
-            .tab-button {
-                padding: 0.375rem 0.75rem;
-                font-size: 0.75rem;
-            }
-            .quiz-question-container {
-                padding: 1rem;
-            }
-            h1.text-3xl {
-                font-size: 1.5rem;
-            }
-            h2.text-2xl {
-                font-size: 1.25rem;
-            }
-            h3.text-xl {
-                font-size: 1.125rem;
-            }
-        }
-        @media (min-width: 769px) {
-            .mobile-header {
-                display: none;
-            }
-            .sidebar {
-                position: fixed;
-                transform: translateX(0) !important;
-            }
-            .main-content {
-                margin-left: 16rem;
-            }
-        }
+        .content-section.active { animation: none; }
+    }
     </style>
 </head>
 <body class="min-h-screen">
     <!-- Mobile Header -->
-    <div class="mobile-header bg-white border-b border-neutral-200 p-4 md:hidden">
+    <div class="mobile-header p-4 md:hidden">
         <div class="flex items-center justify-between">
-            <h1 class="text-lg font-bold text-emerald-800">PostGIS Lecture</h1>
-            <button class="hamburger" onclick="toggleMobileMenu()">
+            <div>
+                <p class="masthead-kicker">The Field Guide</p>
+                <h1 class="masthead-title" style="font-size:1.15rem;margin:0;">The PostGIS Almanac</h1>
+            </div>
+            <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Open contents">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -318,25 +688,36 @@
     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
 
     <aside class="sidebar w-64 min-h-screen p-4 space-y-2 fixed top-0 left-0 h-full overflow-y-auto mobile-hidden md:transform-none" id="sidebar">
-        <h1 class="text-xl font-bold mb-6 text-center text-emerald-800 hidden md:block">PostGIS Lecture</h1>
+        <div class="almanac-masthead hidden md:block mb-5">
+            <p class="masthead-kicker">The Field Guide</p>
+            <h1 class="masthead-title">The PostGIS Almanac</h1>
+            <p class="masthead-sub">Spatial databases &amp; AI-assisted GIS,<br>for public-health research</p>
+            <div class="masthead-rule">✦ &nbsp; ✦ &nbsp; ✦</div>
+        </div>
+        <p class="toc-label hidden md:block">Table of Contents</p>
         <nav>
-            <a href="#overview" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Overview</a>
-            <a href="#why-spatial-db" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Why Spatial Databases?</a>
-            <a href="#postgis-basics" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">PostGIS Fundamentals</a>
-            <a href="#connecting" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Connecting & Querying</a>
-            <a href="#use-cases" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Real-World Applications</a>
-            <a href="#pop-quiz" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Pop Quiz</a>
-            <a href="#summary-resources" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()">Summary & Resources</a>
+            <a href="#overview" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">I</span><span class="nav-label">Overview</span></a>
+            <a href="#why-spatial-db" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">II</span><span class="nav-label">Why Spatial Databases?</span></a>
+            <a href="#postgis-basics" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">III</span><span class="nav-label">PostGIS Fundamentals</span></a>
+            <a href="#connecting" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">IV</span><span class="nav-label">Connecting &amp; Querying</span></a>
+            <a href="#modern-stack" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">V</span><span class="nav-label">Modern GIS Stack (2026)</span></a>
+            <a href="#use-cases" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">VI</span><span class="nav-label">Real-World Applications</span></a>
+            <a href="#gen-ai" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">VII</span><span class="nav-label">Learning GIS with AI</span></a>
+            <a href="#pop-quiz" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">VIII</span><span class="nav-label">Pop Quiz</span></a>
+            <a href="#summary-resources" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">IX</span><span class="nav-label">Summary &amp; Resources</span></a>
         </nav>
     </aside>
 
     <main class="main-content flex-1 p-4 md:p-8 pt-20 md:pt-8 overflow-y-auto">
         <section id="overview" class="content-section">
-            <h1 class="text-3xl font-bold mb-4">Introduction to Spatial Databases (PostGIS) for Public Health Research</h1>
+            <h1 class="text-3xl font-bold mb-4">Spatial Databases (PostGIS) &amp; AI-Assisted GIS for Public Health Research</h1>
             <p class="text-base md:text-lg text-neutral-700 mb-2">Welcome! This interactive application explores the concepts and benefits of using PostGIS spatial databases in public health research. It's designed for researchers who may have limited prior experience with databases or programming but are familiar with public health data.</p>
-            <p class="text-sm md:text-base text-neutral-600">Navigate through the sections using the sidebar to learn about why spatial databases are crucial, understand PostGIS basics, see how to connect using R and Python, explore real-world use cases, test your knowledge with a pop quiz, and find resources for further learning.</p>
+            <p class="text-sm md:text-base text-neutral-600">Navigate through the sections using the sidebar to learn about why spatial databases are crucial, understand PostGIS basics, see how to connect using R and Python, get oriented to the <strong>modern (2026) geospatial stack</strong>, explore real-world use cases, learn <strong>how to use generative AI to study GIS concepts and run spatial analyses safely</strong>, test your knowledge with a pop quiz, and find resources for further learning.</p>
             <div class="key-takeaway">
-                <p><strong>Overall Goal:</strong> To introduce the concept and benefits of using PostGIS spatial databases in public health research and demonstrate basic data access using R and Python.</p>
+                <p><strong>Overall Goal:</strong> To introduce the concept and benefits of using PostGIS spatial databases in public health research, demonstrate basic data access using R and Python, and equip you to learn and perform GIS work with the help of generative AI — responsibly.</p>
+            </div>
+            <div class="ai-tip">
+                <p><strong>📅 2026 revamp:</strong> This edition updates the material for the current geospatial ecosystem (PostGIS 3.6, PostgreSQL 18, GeoParquet, DuckDB, <code>psycopg</code> v3, GeoPandas 1.x) and adds a hands-on guide to <strong>learning and doing GIS with generative AI</strong>. New and updated content is marked with a <span class="badge-new">New</span> badge.</p>
             </div>
         </section>
 
@@ -454,6 +835,7 @@
                 <li>Spatial Functions (hundreds for analysis, e.g., distance, intersection, buffers).</li>
             </ul>
             <p class="mt-2">Analogy: PostgreSQL is the filing cabinet; PostGIS provides special folders and tools for maps within it.</p>
+            <p class="mt-2 text-sm text-neutral-600"><strong>Current versions (mid-2026):</strong> PostgreSQL <strong>18</strong> and PostGIS <strong>3.6.x</strong> are the current stable releases. Recent PostGIS versions keep expanding raster, vector-tile (`ST_AsMVT`), and 3D support, and modern PostgreSQL releases bring faster parallel queries and better JSON handling — all useful for large public-health datasets. You don't need the newest version to learn, but knowing what's current helps when reading docs and asking AI assistants for help.</p>
             <div class="key-takeaway">
                 <p><strong>Key takeaway:</strong> PostGIS turns a regular (but very powerful) database (PostgreSQL) into a spatial powerhouse, specifically designed to handle and analyze geographic information.</p>
             </div>
@@ -603,12 +985,13 @@ dbDisconnect(con)
 
                 <div id="python-code" class="tab-content p-4 bg-white rounded-b-md border border-t-0 border-neutral-300" style="display:none;">
                     <h3 class="text-xl font-semibold mb-2">Using Python with PostGIS</h3>
-                    <p>Key Python Packages: <strong>`geopandas`</strong> (spatial data with pandas-like interface), <strong>`psycopg2-binary`</strong> (PostgreSQL adapter), <strong>`sqlalchemy`</strong> (SQL toolkit, used by geopandas), <strong>`geoalchemy2`</strong> (spatial support for SQLAlchemy).</p>
+                    <p>Key Python Packages: <strong>`geopandas`</strong> (v1.x — spatial data with pandas-like interface), <strong>`psycopg`</strong> (v3, the modern PostgreSQL adapter that replaces the legacy `psycopg2`), <strong>`sqlalchemy`</strong> (v2 SQL toolkit, used by geopandas), and optionally <strong>`geoalchemy2`</strong> (spatial support for SQLAlchemy ORM).</p>
                     <p class="text-sm text-neutral-600 mb-2">The following snippet shows how to connect, read data, and manage the connection. Replace placeholder details.</p>
                     <div class="code-container relative">
                         <pre><code class="language-python">
 # 1. Import necessary libraries
-# !pip install geopandas psycopg2-binary sqlalchemy geoalchemy2 # Run once if not installed
+# pip install "geopandas>=1.0" "psycopg[binary]" "sqlalchemy>=2" geoalchemy2
+# Note (2026): psycopg v3 is the current adapter; psycopg2 is legacy/maintenance-only.
 import geopandas as gpd
 from sqlalchemy import create_engine
 
@@ -619,8 +1002,8 @@ db_name = "your_sample_db_name"
 db_user = "readonly_user"
 db_password = "readonly_password"
 
-# 3. Create a SQLAlchemy engine
-engine_str = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+# 3. Create a SQLAlchemy engine (the "+psycopg" suffix selects the v3 driver)
+engine_str = f"postgresql+psycopg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 engine = create_engine(engine_str)
 
 # 4. Read a spatial table into a GeoDataFrame
@@ -631,7 +1014,8 @@ health_data_gdf = gpd.read_postgis(sql_query_clinics, engine, geom_col='geom')
 
 # 5. View the loaded data
 print(health_data_gdf.head())
-# health_data_gdf.plot() # Simple plot
+# health_data_gdf.explore()  # interactive Leaflet map (geopandas 1.x)
+# For millions of rows, consider 'lonboard' for GPU-accelerated maps.
 
 # 6. Engine disposal (good practice in longer scripts)
 # engine.dispose()
@@ -649,6 +1033,96 @@ print(health_data_gdf.head())
             <p class="mt-2">Performing spatial operations directly in the database using these SQL functions is often very efficient, as it processes data on the server before transferring it to R/Python.</p>
             <div class="key-takeaway mt-4">
                 <p><strong>Key takeaway:</strong> Learning basic SQL, augmented with PostGIS's spatial functions, unlocks the ability to perform powerful and efficient data selection and manipulation directly within the database.</p>
+            </div>
+        </section>
+
+        <section id="modern-stack" class="content-section">
+            <h1 class="text-3xl font-bold mb-4">The Modern Geospatial Stack (2026) <span class="badge-new">New</span></h1>
+            <p class="mb-4 text-neutral-700">PostGIS remains a cornerstone of spatial data work, but the surrounding ecosystem has evolved quickly. This section is a map of the landscape so you know what tools exist, what they're good at, and how they fit alongside PostGIS in a public-health workflow.</p>
+
+            <h2 class="text-2xl font-semibold">PostGIS is no longer the only place to run spatial SQL</h2>
+            <p>A major shift in recent years is that you can now run powerful spatial SQL <em>without</em> a database server at all. The biggest example is <strong>DuckDB</strong> with its <code>spatial</code> extension — an in-process analytical engine (think "SQLite for analytics") that speaks much of the same <code>ST_*</code> spatial SQL you'll learn for PostGIS.</p>
+
+            <div id="duckdb-card" class="interactive-card mt-4">
+                <h3 class="text-xl font-semibold">DuckDB + spatial — the lightweight analytics powerhouse</h3>
+                <div class="interactive-card-content text-sm">
+                    <ul class="list-disc list-inside ml-4 my-2 text-neutral-600">
+                        <li><strong>No server to install or manage</strong> — runs inside R, Python, or the command line.</li>
+                        <li>Reads and writes <strong>GeoParquet</strong>, GeoJSON, Shapefiles, and can query files directly on your disk or in cloud storage (S3/GCS/Azure) without loading them first.</li>
+                        <li>Extremely fast for analytical scans and joins over tens-to-hundreds of millions of features on a laptop.</li>
+                        <li><strong>When to reach for it:</strong> ad-hoc analysis, one-off transformations, reading big open-data files, reproducible notebook pipelines.</li>
+                        <li><strong>When PostGIS is still better:</strong> a shared, central, multi-user database; enforced data integrity; transactional editing; a long-lived authoritative dataset many people query.</li>
+                    </ul>
+                    <p class="mt-1 text-neutral-600">You can even use them together: <code>pg_duckdb</code> and DuckDB's `postgres` extension let DuckDB query a live PostGIS database directly.</p>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Cloud-native geospatial formats</h2>
+            <p>The "shapefile era" is fading. Modern formats are designed for the cloud, for big data, and for streaming only the bytes you need.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold">📦 GeoParquet</h4>
+                    <p class="text-sm text-neutral-600 mt-1">Columnar, compressed vector format. Fast, tiny, and the emerging standard for sharing large vector datasets. Read/written by GeoPandas, DuckDB, QGIS, and more. A modern replacement for shapefiles/CSV exports.</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold">🗺️ PMTiles &amp; vector tiles</h4>
+                    <p class="text-sm text-neutral-600 mt-1">A single-file format for serving interactive maps cheaply (even from static hosting). PostGIS can generate vector tiles directly with <code>ST_AsMVT</code>.</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold">🛰️ COG &amp; STAC (raster)</h4>
+                    <p class="text-sm text-neutral-600 mt-1">Cloud-Optimized GeoTIFFs let you stream just the pixels you need from satellite/environmental imagery; STAC is the catalog standard for finding it — relevant for environmental-exposure work.</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold">🌐 Open base data: Overture Maps</h4>
+                    <p class="text-sm text-neutral-600 mt-1">A large, openly-licensed dataset (places, buildings, transportation, administrative areas) distributed as GeoParquet — useful free context for health analyses.</p>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Spatial indexing beyond R-Trees: H3</h2>
+            <p>Discrete global grid systems like <strong>H3</strong> (hexagonal cells) have become popular for aggregating and joining point data at scale. The <code>h3-pg</code> extension brings H3 functions into PostGIS, which is handy for privacy-preserving aggregation of patient locations into uniform cells.</p>
+
+            <h2 class="text-2xl font-semibold mt-6">Choosing a tool: a quick guide</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Your situation</th>
+                            <th>Good default tool</th>
+                            <th>Why</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Shared, authoritative dataset, many analysts, ongoing edits</td>
+                            <td><strong>PostGIS</strong></td>
+                            <td>Concurrency, integrity, security, central source of truth.</td>
+                        </tr>
+                        <tr>
+                            <td>Ad-hoc analysis of large files on your laptop / in a notebook</td>
+                            <td><strong>DuckDB + spatial</strong></td>
+                            <td>Zero setup, fast, reads GeoParquet & cloud files directly.</td>
+                        </tr>
+                        <tr>
+                            <td>Interactive analysis in a familiar dataframe workflow</td>
+                            <td><strong>GeoPandas (Py) / sf (R)</strong></td>
+                            <td>Ergonomic, great for modeling, plotting, and small-to-medium data.</td>
+                        </tr>
+                        <tr>
+                            <td>Sharing a dataset with collaborators or for archiving</td>
+                            <td><strong>GeoParquet</strong></td>
+                            <td>Compact, typed, portable; far better than shapefiles/CSV.</td>
+                        </tr>
+                        <tr>
+                            <td>Publishing an interactive web map</td>
+                            <td><strong>PMTiles / ST_AsMVT</strong></td>
+                            <td>Cheap, scalable, no heavy map server required.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="key-takeaway mt-4">
+                <p><strong>Key takeaway:</strong> Think in terms of a <em>stack</em>, not a single tool. PostGIS is your durable, shared spatial database; DuckDB and GeoParquet make ad-hoc, large-scale, and cloud analysis fast and cheap; GeoPandas/sf remain your interactive analysis home. The spatial SQL you learn for PostGIS transfers across much of this ecosystem.</p>
             </div>
         </section>
 
@@ -692,6 +1166,221 @@ print(health_data_gdf.head())
             </div>
             <div class="key-takeaway mt-6">
                 <p><strong>Key takeaway:</strong> PostGIS enables sophisticated spatial questions relevant to public health to be answered efficiently, often by performing complex calculations directly in the database using spatial SQL, leading to actionable insights.</p>
+            </div>
+        </section>
+
+        <section id="gen-ai" class="content-section">
+            <h1 class="text-3xl font-bold mb-4">Learning GIS with Generative AI 🤖 <span class="badge-new">New</span></h1>
+            <p class="mb-4 text-neutral-700">Generative AI assistants (such as Claude, ChatGPT, Gemini, and coding tools like GitHub Copilot, Cursor, and Claude Code) have become some of the most effective ways to <em>learn</em> spatial concepts and to <em>accelerate</em> real GIS analysis. They are especially valuable for public-health researchers who know their domain deeply but are newer to databases and code. This section shows you how to use them well — and, just as importantly, how to use them safely.</p>
+
+            <div class="ai-tip">
+                <p><strong>Mindset:</strong> Treat the AI as a tireless, fast, occasionally-overconfident teaching assistant and pair-programmer — not as an oracle. It is excellent at drafting, explaining, and translating. It is <em>you</em> who remains the analyst responsible for correctness, ethics, and interpretation.</p>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Four ways AI helps with GIS</h2>
+            <p>Click each card to expand. These map to the whole learning-to-doing journey.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div id="ai-tutor-card" class="interactive-card">
+                    <h3 class="text-xl font-semibold">1. Tutor &amp; explainer 📖</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Ask it to explain concepts at your level, with public-health examples and analogies. Great for SRIDs, geometry vs. geography, spatial joins, projections, and "why is my distance in degrees?".</p>
+                        <p class="mt-1"><strong>Try:</strong> "Explain the difference between <code>geometry</code> and <code>geography</code> in PostGIS to someone who knows statistics but not GIS, using a clinic-access example."</p>
+                    </div>
+                </div>
+                <div id="ai-coder-card" class="interactive-card">
+                    <h3 class="text-xl font-semibold">2. Code generator &amp; translator 🔁</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Turn a plain-English question into spatial SQL, or translate the same analysis between SQL, R (<code>sf</code>), and Python (<code>geopandas</code>). Excellent for getting unstuck on syntax.</p>
+                        <p class="mt-1"><strong>Try:</strong> "Write a PostGIS query that counts disease cases per district, then show the equivalent in R <code>sf</code> and Python <code>geopandas</code>."</p>
+                    </div>
+                </div>
+                <div id="ai-debug-card" class="interactive-card">
+                    <h3 class="text-xl font-semibold">3. Debugger &amp; reviewer 🐞</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Paste an error message and your query; ask what's wrong and how to fix it. Ask it to review a query for correctness and performance (e.g., "is this using the spatial index?").</p>
+                        <p class="mt-1"><strong>Try:</strong> "This query returns 0 rows but I expected matches. Here's the SQL and the SRIDs of each table — what's likely wrong?"</p>
+                    </div>
+                </div>
+                <div id="ai-copilot-card" class="interactive-card">
+                    <h3 class="text-xl font-semibold">4. Analysis copilot 🚀</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Plan a whole analysis with it: what data you need, which functions to use, how to validate results. Coding-agent tools (Claude Code, Cursor) can even run code, inspect data, and iterate with you.</p>
+                        <p class="mt-1"><strong>Try:</strong> "I want to assess healthcare accessibility for a county. Help me plan the data, the PostGIS steps, and how I'd sanity-check the output."</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">How to write a good GIS prompt</h2>
+            <p>The quality of the answer depends heavily on the context you give. A reliable recipe:</p>
+            <ul class="list-disc list-inside ml-4 my-2 text-neutral-600 space-y-1">
+                <li><strong>Role &amp; level:</strong> "You are a PostGIS expert helping a public-health researcher new to SQL."</li>
+                <li><strong>The environment:</strong> tool and version ("PostGIS 3.6, PostgreSQL 18"), language (SQL / R <code>sf</code> / Python <code>geopandas</code>).</li>
+                <li><strong>The data:</strong> table names, key columns, geometry column name, geometry type, and <strong>SRID</strong> of each layer.</li>
+                <li><strong>The goal:</strong> the precise question and the units you want (meters? rate per 1,000?).</li>
+                <li><strong>The ask:</strong> "explain each step", "use a spatial index", "keep it to one query".</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold mt-4">Copy-ready prompt templates</h3>
+            <p class="text-sm text-neutral-600 mb-2">Fill in the <code>[brackets]</code> and paste into your AI assistant of choice.</p>
+
+            <div class="prompt-box">
+                <span class="prompt-label">Explain a concept</span>
+                <button class="prompt-copy-btn" onclick="copyPrompt(this)">Copy</button>
+                <div class="prompt-text">You are a patient GIS tutor. Explain [CONCEPT, e.g. "what an SRID is and why ST_Transform matters"] to a public-health researcher who understands statistics but is new to spatial data. Use a concrete clinic/disease-mapping example, avoid jargon (or define it), and finish with one common mistake to avoid.</div>
+            </div>
+
+            <div class="prompt-box">
+                <span class="prompt-label">Generate spatial SQL</span>
+                <button class="prompt-copy-btn" onclick="copyPrompt(this)">Copy</button>
+                <div class="prompt-text">You are a PostGIS expert (PostGIS 3.6 / PostgreSQL 18). I have:
+- Table "cases": columns id, diagnosis_date, geom (Point, SRID 4326)
+- Table "districts": columns district_id, name, population, geom (MultiPolygon, SRID 4326)
+Write one SQL query that returns each district's name, case count, and cases per 1,000 population. Make sure it can use a spatial index, and explain each line in plain English.</div>
+            </div>
+
+            <div class="prompt-box">
+                <span class="prompt-label">Translate between languages</span>
+                <button class="prompt-copy-btn" onclick="copyPrompt(this)">Copy</button>
+                <div class="prompt-text">Here is a PostGIS SQL query: [PASTE QUERY]. Show the equivalent analysis (a) in R using the sf package and (b) in Python using geopandas, reading from the same PostGIS database. Note any behavioural differences I should watch for.</div>
+            </div>
+
+            <div class="prompt-box">
+                <span class="prompt-label">Debug an error / empty result</span>
+                <button class="prompt-copy-btn" onclick="copyPrompt(this)">Copy</button>
+                <div class="prompt-text">My PostGIS query returns [ERROR MESSAGE / "0 rows but I expected matches"]. Here is the query: [PASTE QUERY]. The SRID of each table is: [LIST SRIDs]. The geometry columns are: [LIST]. What are the most likely causes, ranked, and how do I check and fix each one?</div>
+            </div>
+
+            <div class="prompt-box">
+                <span class="prompt-label">Plan &amp; sanity-check an analysis</span>
+                <button class="prompt-copy-btn" onclick="copyPrompt(this)">Copy</button>
+                <div class="prompt-text">I want to [RESEARCH GOAL, e.g. "estimate how many people live within 5 km of a clinic in County X"]. I have [DESCRIBE DATA]. Propose a step-by-step PostGIS workflow, flag the assumptions and CRS/units decisions, and tell me three checks I can run to confirm the results are sensible before I trust them.</div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">A safe AI-assisted workflow</h2>
+            <p>Use AI as a loop, not a one-shot. A dependable pattern:</p>
+            <div class="mt-3">
+                <div class="workflow-step"><div class="step-num">1</div><div><strong>Frame the question yourself.</strong> Know what answer would make sense (rough magnitude, units, expected shape of output). This is your guardrail against confident-but-wrong output.</div></div>
+                <div class="workflow-step"><div class="step-num">2</div><div><strong>Give rich context.</strong> Tool/version, table and column names, geometry types, and SRIDs (see the templates above).</div></div>
+                <div class="workflow-step"><div class="step-num">3</div><div><strong>Ask for an explanation, not just code.</strong> "Explain each step" turns the answer into a learning opportunity and surfaces flawed assumptions.</div></div>
+                <div class="workflow-step"><div class="step-num">4</div><div><strong>Run it on a small sample first.</strong> Use <code>LIMIT</code>, a single district, or a known case where you can predict the answer.</div></div>
+                <div class="workflow-step"><div class="step-num">5</div><div><strong>Verify against reality.</strong> Check counts, totals, and a couple of records by hand or with an independent method. Cross-check function names in the official docs.</div></div>
+                <div class="workflow-step"><div class="step-num">6</div><div><strong>Iterate.</strong> Feed back what you saw ("the totals are 10× too high — could it be a unit issue?") and refine.</div></div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Trust, but verify: common AI pitfalls in GIS</h2>
+            <div class="caution">
+                <p><strong>⚠️ AI can be confidently wrong.</strong> Watch for these GIS-specific failure modes:</p>
+                <ul class="list-disc list-inside ml-4 my-2">
+                    <li><strong>Invented functions/arguments:</strong> AI sometimes "hallucinates" a plausible-sounding <code>ST_*</code> function or option that doesn't exist. Confirm names in the <a href="https://postgis.net/docs/reference.html" target="_blank" rel="noopener" class="resource-link">PostGIS reference</a>.</li>
+                    <li><strong>SRID / units mistakes:</strong> measuring distance on SRID 4326 gives <em>degrees</em>, not meters. AI may forget to <code>ST_Transform</code> to a projected CRS or to use the <code>geography</code> type. Always check the units of your answer.</li>
+                    <li><strong>Invalid geometries:</strong> real-world data has self-intersections and nulls. Suggested queries may fail or mislead until you run <code>ST_IsValid</code> / <code>ST_MakeValid</code>.</li>
+                    <li><strong>Performance blind spots:</strong> a "correct" query can be unusably slow without a spatial index or with the wrong join. Ask it to <code>EXPLAIN ANALYZE</code> and to confirm index use.</li>
+                    <li><strong>Outdated patterns:</strong> training data may reference old versions (e.g., <code>psycopg2</code> instead of <code>psycopg</code> v3). State your versions explicitly.</li>
+                    <li><strong>Statistical / epidemiological subtlety:</strong> spatial clustering, the modifiable areal unit problem (MAUP), edge effects, and ecological fallacy are easy for AI to gloss over. Apply your domain expertise.</li>
+                </ul>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">🔒 Data privacy &amp; ethics (read this twice)</h2>
+            <div class="caution">
+                <p><strong>Never paste protected health information (PHI/PII) or precise patient locations into a consumer AI chat.</strong> Patient addresses and coordinates are among the most sensitive and re-identifiable data that exist. Pasting them into a public tool may violate HIPAA, GDPR, IRB protocols, and your institution's data-use agreements.</p>
+                <ul class="list-disc list-inside ml-4 my-2">
+                    <li><strong>Share schema, not data.</strong> Give the AI your <em>table and column structure, types, and SRIDs</em> — never the actual rows.</li>
+                    <li><strong>Use synthetic or fake examples</strong> when you need sample values ("a clinic at lng/lat 0,0").</li>
+                    <li><strong>De-identify and aggregate</strong> before any sharing — e.g., aggregate points to census tracts or H3 cells; apply your jurisdiction's small-cell suppression rules.</li>
+                    <li><strong>Prefer approved/enterprise AI tools</strong> with a zero-data-retention or no-training agreement, or self-hosted/local models, when working near sensitive data — and follow your institution's policy first.</li>
+                    <li><strong>Keep a human in the loop for decisions.</strong> AI output informs analysis; it does not make public-health decisions.</li>
+                </ul>
+            </div>
+            <div class="ai-tip">
+                <p><strong>Good practice:</strong> describe your problem in terms of structure and goals. For example — "I have a points table of de-identified case locations (SRID 4326) and a polygons table of census tracts; help me aggregate cases per tract" — gives the AI everything it needs <em>without exposing a single real record.</em></p>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">The AI tooling landscape for GIS</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold">💬 Chat assistants</h4>
+                    <p class="text-sm text-neutral-600 mt-1">Claude, ChatGPT, Gemini. Best for explaining concepts, drafting queries, translating between languages, and debugging from pasted errors.</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold">⌨️ In-editor assistants</h4>
+                    <p class="text-sm text-neutral-600 mt-1">GitHub Copilot, Cursor, and notebook AI features autocomplete and refactor code where you work — handy in RStudio, VS Code, and Jupyter.</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold">🛠️ Coding agents</h4>
+                    <p class="text-sm text-neutral-600 mt-1">Tools like Claude Code can read your files, run queries, inspect results, and iterate on a whole analysis with you — closer to a true copilot than a chatbot.</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold">🔌 MCP &amp; text-to-SQL</h4>
+                    <p class="text-sm text-neutral-600 mt-1">The Model Context Protocol (MCP) lets AI assistants connect directly to a (read-only!) PostGIS database to inspect the schema and answer questions in natural language. Powerful — but scope permissions tightly, especially with health data.</p>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Emerging generative-AI applications in the field <span class="badge-new">New</span></h2>
+            <p>Beyond chat assistants, generative AI is showing up <em>inside</em> the geospatial workflow. These are real, active areas in 2026 — useful to know about even if you don't use all of them yet. Click a card to expand.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">🛰️ Geospatial foundation models for imagery</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Models like <strong>Prithvi</strong> (NASA–IBM, trained on Landsat/Sentinel-2 and now even running in orbit) and <strong>Clay</strong> turn satellite/aerial imagery into ready-to-use features for flood mapping, burn-scar detection, land-use and cloud-gap reconstruction — with little to no manual feature engineering.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> environmental-exposure assessment, disaster response, monitoring flooding/heat/air-quality drivers of disease.</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">✂️ Promptable feature extraction (SAM-for-geo)</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Segment-Anything-style models (e.g., <code>segment-geospatial</code>/<code>samgeo</code>) let you extract buildings, water bodies, fields, or roads from imagery with a click or a text prompt — no hand-digitizing.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> rapidly mapping settlements/buildings for population denominators, sanitation, or access studies in data-poor regions.</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">💬 "Chat with your map / database"</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>QGIS LLM plugins (<strong>GeoAgent, Promptly, IntelliGeo, Whitebox AI Agent</strong>) and MCP/text-to-SQL tools let you describe an operation in plain language; the AI inspects your layers/CRS/schema and generates the geoprocessing or SQL to run it.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> lowers the barrier for epidemiologists to run spatial analyses without deep GIS/SQL skills (still verify the output!).</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">🧪 Synthetic &amp; privacy-preserving data</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Generative models can produce <strong>synthetic populations or case locations</strong> that preserve realistic spatial distributions without exposing real individuals — for sharing, teaching, or method development.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> collaborate and publish reproducible spatial methods while protecting PHI; build demos without real patient data.</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">📍 Geocoding, parsing &amp; record linkage</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>LLMs are strong at cleaning messy addresses, standardizing place names, parsing free-text locations from clinical notes, and matching records across datasets that lack a shared key.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> turning inconsistent surveillance/EHR address fields into mappable, linkable data (do this on de-identified data in approved environments).</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">🔎 Semantic + spatial search (embeddings)</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>With <code>pgvector</code> inside PostgreSQL/PostGIS you can combine <strong>vector embeddings</strong> (semantic similarity) with spatial filters — e.g., "facilities <em>similar to</em> X <em>and</em> within 10 km" — in a single database.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> retrieval-augmented analysis over reports/facilities, smarter matching of services to needs.</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">🤝 Agentic analysis copilots</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Coding agents (e.g., Claude Code, Cursor) now read your files, write and run spatial code, inspect results, and iterate end-to-end — turning a research question into a reproducible pipeline with you supervising.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> faster, more reproducible analyses; great for prototyping a study workflow before scaling it.</p>
+                    </div>
+                </div>
+                <div class="interactive-card">
+                    <h3 class="text-lg font-semibold">🗺️ AI cartography &amp; narrative reporting</h3>
+                    <div class="interactive-card-content text-sm">
+                        <p>Generative tools assist with map styling, choosing classifications/color schemes, and drafting plain-language summaries of spatial results for briefs and dashboards.</p>
+                        <p class="mt-1"><strong>Public-health relevance:</strong> communicating findings to decision-makers and the public quickly — with a human checking accuracy and avoiding misleading maps.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="caution">
+                <p><strong>⚠️ Same rules apply:</strong> these applications are powerful but not infallible. Foundation-model outputs need ground-truthing, LLM-generated code and SQL need verification, and <strong>none of them excuse putting real PHI into unapproved tools.</strong> Treat AI output as a draft to validate, not a result to publish.</p>
+            </div>
+
+            <div class="key-takeaway mt-6">
+                <p><strong>Key takeaway:</strong> Generative AI dramatically lowers the barrier to learning and doing GIS — as a tutor, code translator, debugger, and analysis copilot. Get the most from it by giving rich context (versions, schema, SRIDs), asking for explanations, and verifying every result. And never trade your participants' privacy for convenience: share structure, not sensitive data.</p>
             </div>
         </section>
 
@@ -783,6 +1472,40 @@ print(health_data_gdf.head())
                     <p><strong>Rationale:</strong> `ST_DWithin(geometry1, geometry2, distance)` is specifically designed to efficiently check if two geometries are within a certain distance of each other, and it can leverage spatial indexes effectively for this type of query.</p>
                 </div>
             </div>
+
+            <div class="quiz-question-container">
+                <h4 class="quiz-question-text">Question 6: You need to do fast, one-off analysis of a 50-million-row GeoParquet file on your laptop, with no database server to set up. Which modern tool is the best fit?</h4>
+                <div class="quiz-options">
+                    <ul>
+                        <li>A) A shapefile opened in a spreadsheet</li>
+                        <li data-correct="false">B) DuckDB with the spatial extension</li>
+                        <li>C) Emailing the file to a colleague</li>
+                        <li>D) Converting everything to CSV first</li>
+                    </ul>
+                </div>
+                <button class="show-answer-btn" onclick="toggleAnswer(this, 'B')">Show Answer</button>
+                <div class="answer-content" style="display:none;">
+                    <p><strong>Correct Answer: B</strong></p>
+                    <p><strong>Rationale:</strong> DuckDB + <code>spatial</code> is an in-process engine that needs no server, reads GeoParquet directly, and runs spatial SQL very fast over tens of millions of rows on a laptop. PostGIS is better when you need a shared, central, multi-user database — but here a lightweight, serverless engine is ideal.</p>
+                </div>
+            </div>
+
+            <div class="quiz-question-container">
+                <h4 class="quiz-question-text">Question 7: You're using a generative AI assistant to help with a spatial analysis of de-identified patient case locations. Which practice is most appropriate?</h4>
+                <div class="quiz-options">
+                    <ul>
+                        <li>A) Paste the full table of patient coordinates so the AI has complete context.</li>
+                        <li data-correct="false">B) Describe the schema (table/column names, geometry types, SRIDs) and use synthetic example values — never real PHI.</li>
+                        <li>C) Trust the generated query without checking, since AI rarely makes mistakes.</li>
+                        <li>D) Skip stating your PostGIS version because it never matters.</li>
+                    </ul>
+                </div>
+                <button class="show-answer-btn" onclick="toggleAnswer(this, 'B')">Show Answer</button>
+                <div class="answer-content" style="display:none;">
+                    <p><strong>Correct Answer: B</strong></p>
+                    <p><strong>Rationale:</strong> Share <em>structure, not sensitive data</em>. Giving the AI your schema and SRIDs (plus synthetic examples) provides everything it needs to help, without exposing re-identifiable health information. You should also verify the output and state your tool versions for accurate, up-to-date answers.</p>
+                </div>
+            </div>
         </section>
 
         <section id="summary-resources" class="content-section">
@@ -795,7 +1518,9 @@ print(health_data_gdf.head())
                 <li><strong>Enables Complex Spatial Analysis:</strong> Rich library of spatial SQL functions for proximity, containment, overlay, buffering directly in the database.</li>
                 <li><strong>Promotes Data Integrity and Scalability:</strong> Enforces data types, relationships; efficiently manages very large datasets.</li>
                 <li><strong>Facilitates Collaboration:</strong> Multi-user environment for centralized, consistent data access.</li>
-                <li><strong>Integrates with Familiar Analysis Environments:</strong> Easy access from R (sf, DBI) and Python (geopandas, SQLAlchemy).</li>
+                <li><strong>Integrates with Familiar Analysis Environments:</strong> Easy access from R (sf, DBI) and Python (geopandas, SQLAlchemy, psycopg v3).</li>
+                <li><strong>Fits a Modern Stack:</strong> Complements cloud-native formats (GeoParquet), serverless engines (DuckDB + spatial), and open base data (Overture Maps) — the spatial SQL you learn transfers across them.</li>
+                <li><strong>Pairs Well with Generative AI:</strong> AI assistants accelerate learning and analysis — when you supply rich context (versions, schema, SRIDs), verify results, and protect sensitive data.</li>
             </ul>
             
             <h2 class="text-2xl font-semibold mt-6">Q&A and Further Resources</h2>
@@ -820,13 +1545,40 @@ print(health_data_gdf.head())
                 <li>`psycopg2` (PostgreSQL adapter): <a href="https://www.psycopg.org/docs/" target="_blank" rel="noopener" class="resource-link">psycopg.org/docs/</a> (psycopg2/3)</li>
             </ul>
 
+            <h3 class="text-xl font-semibold mt-4">Modern Geospatial Stack: <span class="badge-new">New</span></h3>
+            <ul class="list-disc list-inside ml-4 my-2">
+                <li>DuckDB Spatial: <a href="https://duckdb.org/docs/stable/core_extensions/spatial/overview" target="_blank" rel="noopener" class="resource-link">duckdb.org &rarr; spatial</a></li>
+                <li>GeoParquet: <a href="https://geoparquet.org" target="_blank" rel="noopener" class="resource-link">geoparquet.org</a></li>
+                <li>Overture Maps (open base data): <a href="https://overturemaps.org" target="_blank" rel="noopener" class="resource-link">overturemaps.org</a></li>
+                <li>Cloud-Native Geospatial Forum: <a href="https://cloudnativegeo.org" target="_blank" rel="noopener" class="resource-link">cloudnativegeo.org</a></li>
+                <li>Spatial SQL reference (PostGIS functions): <a href="https://postgis.net/docs/reference.html" target="_blank" rel="noopener" class="resource-link">postgis.net/docs/reference.html</a></li>
+            </ul>
+
+            <h3 class="text-xl font-semibold mt-4">Learning &amp; Doing GIS with AI: <span class="badge-new">New</span></h3>
+            <ul class="list-disc list-inside ml-4 my-2 text-neutral-600">
+                <li>Use the <strong>copy-ready prompt templates</strong> in the "Learning GIS with AI" section as starting points.</li>
+                <li>Always state your <strong>tool + version</strong> (e.g., "PostGIS 3.6, PostgreSQL 18") and your <strong>schema + SRIDs</strong> in prompts.</li>
+                <li><strong>Verify</strong> AI-suggested function names against the official PostGIS reference, and check the <strong>units</strong> of any distance/area result.</li>
+                <li><strong>Privacy:</strong> never paste PHI/PII or precise patient coordinates into AI tools — share structure and synthetic examples, follow your institution's data policy, and prefer approved/enterprise or local models near sensitive data.</li>
+            </ul>
+            <p class="mt-2 text-sm text-neutral-600">Emerging GenAI-in-geospatial to explore:</p>
+            <ul class="list-disc list-inside ml-4 my-2">
+                <li>Prithvi geospatial foundation model: <a href="https://huggingface.co/ibm-nasa-geospatial" target="_blank" rel="noopener" class="resource-link">ibm-nasa-geospatial (Hugging Face)</a></li>
+                <li>Clay foundation model: <a href="https://madewithclay.org" target="_blank" rel="noopener" class="resource-link">madewithclay.org</a></li>
+                <li>segment-geospatial (SAM for imagery): <a href="https://samgeo.gishub.org" target="_blank" rel="noopener" class="resource-link">samgeo.gishub.org</a></li>
+                <li>QGIS LLM plugins (GeoAgent, Promptly, IntelliGeo): <a href="https://plugins.qgis.org/plugins/tags/natural-language/" target="_blank" rel="noopener" class="resource-link">QGIS natural-language plugins</a></li>
+                <li>pgvector (embeddings in PostgreSQL): <a href="https://github.com/pgvector/pgvector" target="_blank" rel="noopener" class="resource-link">github.com/pgvector/pgvector</a></li>
+            </ul>
+
             <h3 class="text-xl font-semibold mt-4">General Tutorial Search Terms:</h3>
             <ul class="list-disc list-inside ml-4 my-2 text-neutral-600">
                 <li>"PostGIS Introduction tutorial"</li>
                 <li>"GeoPandas PostGIS tutorial"</li>
                 <li>"R sf PostGIS tutorial"</li>
+                <li>"DuckDB spatial GeoParquet tutorial"</li>
+                <li>"spatial SQL ST_DWithin example"</li>
             </ul>
-            <p class="mt-4">Hands-on practice with the provided sample database details and code snippets is highly encouraged!</p>
+            <p class="mt-4">Hands-on practice with the provided sample database details and code snippets is highly encouraged — and try working through one of the use cases with an AI assistant as your tutor!</p>
         </section>
     </main>
 
@@ -900,6 +1652,30 @@ print(health_data_gdf.head())
                 buttonElement.innerText = 'Failed!';
             }
             
+            document.body.removeChild(tempTextArea);
+
+            setTimeout(() => {
+                buttonElement.innerText = originalButtonText;
+            }, 2000);
+        }
+
+        function copyPrompt(buttonElement) {
+            const box = buttonElement.closest('.prompt-box');
+            const textToCopy = box.querySelector('.prompt-text').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            const originalButtonText = buttonElement.innerText;
+
+            try {
+                document.execCommand('copy');
+                buttonElement.innerText = 'Copied!';
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                buttonElement.innerText = 'Failed!';
+            }
+
             document.body.removeChild(tempTextArea);
 
             setTimeout(() => {
