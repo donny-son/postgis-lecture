@@ -1,0 +1,68 @@
+/* Hallmark · custom theme "Vintage Almanac"
+ * tone: warm / nostalgic / wholesome · genre: editorial
+ * paper oklch(96.5% 0.02 88) cream · accent oklch(56% 0.125 42) terracotta + botanical green
+ * display Fraunces · body Newsreader · mono IBM Plex Mono
+ * Portable token set for the PostGIS Almanac lecture.
+ */
+:root {
+    /* —— paper & ink —— */
+    --color-paper:    oklch(96.5% 0.020 88);
+    --color-paper-2:  oklch(93.5% 0.024 86);
+    --color-paper-3:  oklch(90.5% 0.028 84);
+    --color-card:     oklch(98.2% 0.012 92);
+    --color-ink:      oklch(28% 0.022 50);
+    --color-ink-soft: oklch(43% 0.022 52);
+    --color-ink-faint:oklch(56% 0.018 54);
+
+    /* —— botanical green —— */
+    --color-green:        oklch(48% 0.085 152);
+    --color-green-deep:   oklch(38% 0.075 152);
+    --color-green-soft:   oklch(80% 0.050 150);
+    --color-green-tint:   oklch(94% 0.030 150);
+    --color-green-tint-2: oklch(90% 0.042 150);
+
+    /* —— terracotta (primary warm accent) —— */
+    --color-clay:      oklch(56% 0.125 42);
+    --color-clay-deep: oklch(48% 0.125 40);
+    --color-clay-soft: oklch(82% 0.060 45);
+    --color-clay-tint: oklch(93% 0.035 50);
+
+    /* —— brick red (caution) —— */
+    --color-brick:      oklch(53% 0.155 30);
+    --color-brick-deep: oklch(45% 0.150 30);
+    --color-brick-soft: oklch(82% 0.070 35);
+    --color-brick-tint: oklch(94% 0.030 35);
+
+    /* —— dusty blue (AI tips) —— */
+    --color-blue:      oklch(52% 0.075 248);
+    --color-blue-deep: oklch(43% 0.080 250);
+    --color-blue-tint: oklch(94% 0.025 245);
+
+    /* —— ochre / gold (prompt cards, badges) —— */
+    --color-gold:      oklch(64% 0.105 75);
+    --color-gold-deep: oklch(52% 0.100 70);
+    --color-gold-soft: oklch(84% 0.070 80);
+    --color-gold-tint: oklch(94% 0.040 82);
+
+    /* —— rules —— */
+    --color-rule:        oklch(82% 0.018 70);
+    --color-rule-strong: oklch(72% 0.022 65);
+
+    /* —— type —— */
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body:    'Newsreader', Georgia, serif;
+    --font-mono:    'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+    /* —— space (4pt) —— */
+    --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 1rem;
+    --space-lg: 1.5rem; --space-xl: 2.5rem; --space-2xl: 4rem;
+
+    /* —— motion —— */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in:  cubic-bezier(0.7, 0, 0.84, 0);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --dur-fast: 140ms; --dur-mid: 280ms; --dur-slow: 560ms;
+
+    /* —— radius —— */
+    --radius-sm: 3px; --radius-md: 6px; --radius-lg: 10px;
+}
