@@ -1,56 +1,102 @@
 /* ──────────────────────────────────────────────────────────────────────────
    The PostGIS Almanac · Slidev theme overrides
-   Vintage Almanac aesthetic — warm cream paper, terracotta + botanical green,
-   Fraunces (display) · Newsreader (body) · IBM Plex Mono (code)
-   Ported from the interactive lecture's design tokens.
+   Modern docs aesthetic — slate surfaces, indigo primary, emerald/rose/blue/amber
+   accents, Inter (display + body) · IBM Plex Mono (code). Light + dark.
+   Shares the interactive lecture's design tokens; `.dark` flips the whole deck.
    ────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* —— paper & ink —— */
-  --color-paper:    oklch(96.5% 0.020 88);
-  --color-paper-2:  oklch(93.5% 0.024 86);
-  --color-paper-3:  oklch(90.5% 0.028 84);
-  --color-card:     oklch(98.2% 0.012 92);
-  --color-ink:      oklch(28% 0.022 50);
-  --color-ink-soft: oklch(43% 0.022 52);
-  --color-ink-faint:oklch(56% 0.018 54);
+  /* —— surfaces & ink (slate) —— */
+  --color-paper:    #f8fafc;
+  --color-paper-2:  #f1f5f9;
+  --color-paper-3:  #e2e8f0;
+  --color-card:     #ffffff;
+  --color-ink:      #0f172a;
+  --color-ink-soft: #475569;
+  --color-ink-faint:#64748b;
 
-  /* —— botanical green —— */
-  --color-green:        oklch(48% 0.085 152);
-  --color-green-deep:   oklch(38% 0.075 152);
-  --color-green-soft:   oklch(80% 0.050 150);
-  --color-green-tint:   oklch(94% 0.030 150);
-  --color-green-tint-2: oklch(90% 0.042 150);
+  /* —— code surface (dark in both themes) —— */
+  --color-code-bg:  #0f172a;
+  --color-code-fg:  #e2e8f0;
 
-  /* —— terracotta (primary warm accent) —— */
-  --color-clay:      oklch(56% 0.125 42);
-  --color-clay-deep: oklch(48% 0.125 40);
-  --color-clay-soft: oklch(82% 0.060 45);
-  --color-clay-tint: oklch(93% 0.035 50);
+  /* —— primary accent (indigo) —— */
+  --color-clay:      #4f46e5;
+  --color-clay-deep: #4338ca;
+  --color-clay-soft: #c7d2fe;
+  --color-clay-tint: #eef2ff;
 
-  /* —— brick red (caution) —— */
-  --color-brick:      oklch(53% 0.155 30);
-  --color-brick-deep: oklch(45% 0.150 30);
-  --color-brick-soft: oklch(82% 0.070 35);
-  --color-brick-tint: oklch(94% 0.030 35);
+  /* —— success (emerald) —— */
+  --color-green:        #059669;
+  --color-green-deep:   #047857;
+  --color-green-soft:   #a7f3d0;
+  --color-green-tint:   #ecfdf5;
+  --color-green-tint-2: #d1fae5;
 
-  /* —— dusty blue (AI tips) —— */
-  --color-blue:      oklch(52% 0.075 248);
-  --color-blue-deep: oklch(43% 0.080 250);
-  --color-blue-tint: oklch(94% 0.025 245);
+  /* —— caution (rose) —— */
+  --color-brick:      #e11d48;
+  --color-brick-deep: #be123c;
+  --color-brick-soft: #fecdd3;
+  --color-brick-tint: #fff1f2;
 
-  /* —— ochre / gold (prompt cards, badges) —— */
-  --color-gold:      oklch(64% 0.105 75);
-  --color-gold-deep: oklch(52% 0.100 70);
-  --color-gold-soft: oklch(84% 0.070 80);
-  --color-gold-tint: oklch(94% 0.040 82);
+  /* —— info (blue) — AI tips —— */
+  --color-blue:      #2563eb;
+  --color-blue-deep: #1d4ed8;
+  --color-blue-tint: #eff6ff;
+
+  /* —— prompt / badge (amber) —— */
+  --color-gold:      #d97706;
+  --color-gold-deep: #b45309;
+  --color-gold-soft: #fde68a;
+  --color-gold-tint: #fffbeb;
 
   /* —— rules —— */
-  --color-rule:        oklch(82% 0.018 70);
-  --color-rule-strong: oklch(72% 0.022 65);
+  --color-rule:        #e2e8f0;
+  --color-rule-strong: #cbd5e1;
 
   /* —— Slidev theme hooks —— */
   --slidev-theme-primary: var(--color-clay);
+}
+
+/* —— dark theme: Slidev toggles `.dark` on the root —— */
+html.dark, .dark {
+  --color-paper:    #0b1220;
+  --color-paper-2:  #0f172a;
+  --color-paper-3:  #1e293b;
+  --color-card:     #131c2e;
+  --color-ink:      #e5e9f0;
+  --color-ink-soft: #9aa7bd;
+  --color-ink-faint:#64748b;
+
+  --color-code-bg:  #0b1220;
+  --color-code-fg:  #e2e8f0;
+
+  --color-clay:      #6366f1;
+  --color-clay-deep: #a5b4fc;
+  --color-clay-soft: #3730a3;
+  --color-clay-tint: #1e1b4b;
+
+  --color-green:        #34d399;
+  --color-green-deep:   #6ee7b7;
+  --color-green-soft:   #065f46;
+  --color-green-tint:   rgba(16, 185, 129, 0.13);
+  --color-green-tint-2: rgba(16, 185, 129, 0.20);
+
+  --color-brick:      #fb7185;
+  --color-brick-deep: #fda4af;
+  --color-brick-soft: #9f1239;
+  --color-brick-tint: rgba(244, 63, 94, 0.13);
+
+  --color-blue:      #60a5fa;
+  --color-blue-deep: #93c5fd;
+  --color-blue-tint: rgba(59, 130, 246, 0.13);
+
+  --color-gold:      #fbbf24;
+  --color-gold-deep: #fcd34d;
+  --color-gold-soft: #92400e;
+  --color-gold-tint: rgba(245, 158, 11, 0.13);
+
+  --color-rule:        #243044;
+  --color-rule-strong: #334155;
 }
 
 /* ── Fonts ────────────────────────────────────────────────────────────────
@@ -58,7 +104,7 @@
    in slides.md, which injects the Google Fonts links automatically. */
 
 .slidev-layout {
-  font-family: 'Newsreader', Georgia, serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   font-size: 1.05rem;
   line-height: 1.6;
   color: var(--color-ink);
@@ -72,7 +118,7 @@
 .slidev-layout h2,
 .slidev-layout h3,
 .slidev-layout h4 {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   font-optical-sizing: auto;
   color: var(--color-ink);
   line-height: 1.12;
@@ -83,10 +129,10 @@
   color: var(--color-ink);
   letter-spacing: -0.01em;
 }
-.slidev-layout h2 { color: var(--color-green-deep); }
+.slidev-layout h2 { color: var(--color-ink); }
 .slidev-layout h3 { color: var(--color-ink); }
 
-/* terracotta ornament under the leading H1 of content slides */
+/* tighten the leading paragraph under a content-slide H1 */
 .slidev-layout h1 + p,
 .slidev-layout h1 + .ornament { margin-top: 0.4rem; }
 
@@ -111,13 +157,13 @@
   border-radius: 3px;
 }
 
-/* ── Code blocks (cozy espresso panel) ────────────────────────────────────── */
+/* ── Code blocks (dark panel in both themes) ──────────────────────────────── */
 .slidev-layout pre.slidev-code,
 .slidev-layout .slidev-code-wrapper pre {
-  background-color: var(--color-ink) !important;
-  border: 1px solid var(--color-ink);
-  border-radius: 6px;
-  box-shadow: inset 0 0 0 1px oklch(40% 0.03 60 / 0.5);
+  background-color: var(--color-code-bg) !important;
+  border: 1px solid var(--color-rule-strong);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 0.78rem;
   line-height: 1.55;
@@ -143,11 +189,11 @@
 .slidev-layout th {
   background-color: var(--color-paper-3);
   color: var(--color-green-deep);
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
   border-bottom: 2px solid var(--color-rule-strong);
 }
-.slidev-layout tbody tr:nth-child(even) { background-color: oklch(95% 0.018 88 / 0.55); }
+.slidev-layout tbody tr:nth-child(even) { background-color: var(--color-paper); }
 
 /* ── Callout boxes (reusable utility classes) ─────────────────────────────── */
 .callout {
@@ -170,7 +216,7 @@
 .callout.caution strong { color: var(--color-brick-deep); }
 .callout.ai-tip {
   background-color: var(--color-blue-tint);
-  border: 1px solid oklch(86% 0.04 245);
+  border: 1px solid var(--color-rule);
   border-left: 4px solid var(--color-blue);
 }
 .callout.ai-tip strong { color: var(--color-blue-deep); }
@@ -194,7 +240,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
   color: var(--color-clay-deep);
   margin-bottom: 0.35rem;
@@ -224,7 +270,7 @@
   border: 1px solid transparent;
 }
 .track.duck { color: var(--color-gold-deep); background: var(--color-gold-tint); border-color: var(--color-gold-soft); }
-.track.docker { color: var(--color-blue-deep); background: var(--color-blue-tint); border-color: oklch(86% 0.04 245); }
+.track.docker { color: var(--color-blue-deep); background: var(--color-blue-tint); border-color: var(--color-rule); }
 .track.sql { color: var(--color-green-deep); background: var(--color-green-tint); border-color: var(--color-green-soft); }
 .track.py { color: var(--color-clay-deep); background: var(--color-clay-tint); border-color: var(--color-clay-soft); }
 .track.r  { color: var(--color-brick-deep); background: var(--color-brick-tint); border-color: var(--color-brick-soft); }
@@ -305,7 +351,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
   font-size: 0.85rem;
 }
@@ -340,7 +386,7 @@
 .slidev-layout.intro {
   background-color: var(--color-paper);
 }
-.slidev-layout.cover h1 { font-style: italic; }
+.slidev-layout.cover h1 { font-weight: 700; letter-spacing: -0.02em; }
 
 /* Quiz answer reveal accent */
 .answer {
@@ -357,10 +403,12 @@
 .slidev-layout ul { line-height: 1.5; }
 .slidev-layout li { margin: 0.12rem 0; }
 
-/* footer ornament */
+/* clean accent rule (cover / closing dividers) */
 .slidev-layout .ornament-rule {
-  color: var(--color-clay);
-  letter-spacing: 0.4em;
-  font-size: 0.75rem;
-  text-align: center;
+  height: 3px;
+  width: 56px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 999px;
+  background: var(--color-clay);
 }

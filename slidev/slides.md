@@ -18,8 +18,8 @@ drawings:
 transition: slide-left
 mdc: true
 fonts:
-  sans: Newsreader
-  serif: Fraunces
+  sans: Inter
+  serif: Inter
   mono: IBM Plex Mono
   fallbacks: false
 css: unocss
@@ -31,7 +31,7 @@ css: unocss
 
 ## Spatial Databases & AI-Assisted GIS <br> for Public Health Research
 
-<div class="ornament-rule mt-6">✦ &nbsp; ✦ &nbsp; ✦</div>
+<div class="ornament-rule mt-6"></div>
 
 <div class="text-sm opacity-70 mt-4">
 2026 edition · PostGIS 3.6 · PostgreSQL 18 · GeoParquet · DuckDB · generative AI
@@ -2552,7 +2552,7 @@ class: text-center
 
 # Thank you
 
-<div class="ornament-rule mt-4 mb-6">✦ &nbsp; ✦ &nbsp; ✦</div>
+<div class="ornament-rule mt-4 mb-6"></div>
 
 Keep the momentum: re-run the clinic-accessibility case study on your own data,
 with an AI assistant as your tutor — and verify every result.
