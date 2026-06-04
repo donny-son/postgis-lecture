@@ -1434,6 +1434,170 @@ extension let DuckDB query a live PostGIS database.
 
 ---
 
+# PostGIS vs. DuckDB — opposite by design <span class="badge-new">New</span>
+
+Both speak `ST_*` SQL, so they look interchangeable. They aren't — they're **architecturally opposite tools** that happen to share a query language.
+
+<div class="grid grid-cols-2 gap-5 mt-3">
+
+<div class="card">
+<div><span class="track docker">PostGIS</span> <strong>A spatial system of record</strong></div>
+<div class="text-sm mt-2">
+
+- **Client–server** — one long-running DB many people connect to
+- **Row-oriented + MVCC** — concurrent reads *and* writes, live editing
+- **Durable & governed** — roles, constraints, backups, one source of truth
+- **Deepest toolbox** — geography, raster, topology, `ST_AsMVT`
+
+</div>
+<div class="text-xs opacity-70 mt-2">Shines when data is shared, edited, long-lived.</div>
+</div>
+
+<div class="card">
+<div><span class="track duck">DuckDB</span> <strong>A spatial analytics engine</strong></div>
+<div class="text-sm mt-2">
+
+- **In-process** — a library inside Python/R/CLI; "SQLite for analytics"
+- **Columnar + vectorized** — tears through scans, aggregations, joins
+- **Files-first** — queries GeoParquet/CSV in place, often no import
+- **Lean** — `pip install`, auto-builds spatial indexes at query time
+
+</div>
+<div class="text-xs opacity-70 mt-2">Shines for ad-hoc, single-analyst, big-file work.</div>
+</div>
+
+</div>
+
+<div class="callout takeaway mt-3 text-sm">
+<strong>One-liner:</strong> PostGIS is a <em>database you connect to</em>; DuckDB is a <em>library you run inside your script</em>.
+</div>
+
+---
+
+# At a glance — same language, opposite engines
+
+<div class="text-sm">
+
+| Dimension | <span class="track docker">PostGIS</span> | <span class="track duck">DuckDB + spatial</span> |
+|---|---|---|
+| **Architecture** | Client–server; persistent process | Embedded, in-process (like SQLite) |
+| **Sweet spot** | Transactional (OLTP) + many users | Analytical (OLAP) scans & joins |
+| **Storage** | Row-oriented heap | Columnar, vectorized |
+| **Concurrency** | Many readers *and* writers (MVCC) | One process; great parallel reads |
+| **Getting data in** | Load into tables first | Query files in place — no import |
+| **Spatial index** | Persistent GiST you `CREATE INDEX` | R-Tree built automatically |
+| **`geography` type** | Yes — true geodetic metres | No — project or use sphere helpers |
+| **Functions** | Hundreds; raster, topology, tiles | Growing GEOS-backed subset |
+| **Setup** | Run a server / Docker | `pip install duckdb` |
+| **Role** | Durable, shared source of truth | Fast analytical scratchpad / ETL |
+
+</div>
+
+---
+
+# Same SQL — watch the dialect edges <span class="track sql">SQL</span>
+
+The core predicates are identical. The differences are at the edges: point construction, the `geography` type, and how you generate rows.
+
+<div class="grid grid-cols-2 gap-4 mt-1">
+
+<div>
+
+<span class="track docker">PostGIS</span>
+
+```sql
+-- Stamp an SRID on a point
+ST_SetSRID(ST_MakePoint(-117.4,33.9),4326)
+
+-- True metres via geography
+ST_DWithin(a.geom::geography,
+           b.geom::geography, 5000)
+
+-- Generate rows
+FROM generate_series(0,18) gx,
+     generate_series(0,16) gy
+
+-- Persistent index (you make it)
+CREATE INDEX ON blocks USING GIST(geom);
+```
+
+</div>
+
+<div>
+
+<span class="track duck">DuckDB</span>
+
+```sql
+-- (x, y) directly
+ST_Point(-117.4, 33.9)
+
+-- No geography: project to metres…
+ST_DWithin(ST_Transform(a.geom,
+  'EPSG:4326','EPSG:32611'), …, 5000)
+-- …or ST_Distance_Sphere(a, b)
+
+-- range() in a cross join
+FROM range(0,19) t(gx),
+     range(0,17) u(gy)
+
+-- No index needed; read files too:
+SELECT * FROM 'blocks.parquet';
+```
+
+</div>
+
+</div>
+
+<div class="callout caution mt-2 text-sm">
+<strong>The two gotchas:</strong> (1) DuckDB has <em>no <code>geography</code> type</em> — for metres, <code>ST_Transform</code> to a UTM CRS or use <code>ST_Distance_Sphere</code>; a bare lon/lat distance is in degrees. (2) <code>generate_series</code> as a row source differs — use <code>range()</code>.
+</div>
+
+---
+
+# When to use which — and using both
+
+<div class="grid grid-cols-2 gap-5 mt-2">
+
+<div>
+
+<div class="card text-sm">
+<strong>Reach for <span class="track docker">PostGIS</span> when:</strong>
+
+- Many analysts share one authoritative dataset
+- You need concurrent edits, integrity, roles
+- It backs an app, API, or live web map
+- The dataset is long-lived and governed
+
+</div>
+
+<div class="card text-sm mt-2">
+<strong>Reach for <span class="track duck">DuckDB</span> when:</strong>
+
+- One analyst, one laptop, big files
+- Ad-hoc analysis or a notebook pipeline
+- Reading GeoParquet / cloud data directly
+- Speed of setup matters more than sharing
+
+</div>
+
+</div>
+
+<div>
+
+<div class="callout ai-tip text-sm">
+<strong>Better together — the common 2026 pattern:</strong> use DuckDB for the heavy lifting (scan a 50-million-row GeoParquet file, filter and aggregate to a tidy result), then write that result <em>into</em> PostGIS as the shared, governed table everyone queries and maps.
+</div>
+
+<div class="callout takeaway text-sm mt-2">
+With <code>pg_duckdb</code> or DuckDB's <code>postgres</code> extension, each can even reach into the other <strong>live</strong> — no export step.
+</div>
+
+</div>
+
+</div>
+
+---
+
 # Cloud-native geospatial formats
 
 The "shapefile era" is fading. Modern formats are built for the cloud, for big data, and for streaming only the bytes you need.
