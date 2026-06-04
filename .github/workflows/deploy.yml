@@ -51,6 +51,13 @@ jobs:
           # Slidev web deck under /slides/
           mkdir -p _site/slides
           cp -r slidev/dist/. _site/slides/
+          # SPA fallback: the Slidev deck is a single-page app, so deep links
+          # like /slides/4 (direct load, refresh, or shared link) have no file
+          # on disk. GitHub Pages serves the site-root 404.html for any unmatched
+          # path, so point it at the deck — it boots and client-routes to the
+          # requested slide. (Stray non-/slides/ URLs also land here, a minor
+          # cosmetic tradeoff; the only real root page, index.html, is unaffected.)
+          cp slidev/dist/index.html _site/404.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
