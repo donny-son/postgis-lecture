@@ -46,6 +46,10 @@ jobs:
           # Root interactive lecture
           cp index.html _site/
           cp tokens.css _site/
+          # Interactive spatial explorer under /interactive/ (static; ships GeoJSON
+          # snapshots of the teaching DB + MapLibre/Turf/DuckDB-WASM from CDNs).
+          mkdir -p _site/interactive
+          cp -r interactive/index.html interactive/app.js interactive/style.css interactive/data _site/interactive/
           # Preserve the custom domain on GitHub Pages
           echo 'postgis.son.do' > _site/CNAME
           # Slidev web deck under /slides/
