@@ -263,23 +263,30 @@ JOIN hospitals h
   ON ST_Contains(p.geom, h.geom)
 GROUP BY p.name
 ORDER BY facilities DESC;` },
-  { t: 'Proximity — distance to a point (metres)', sql:
-`-- DuckDB has no geography type: project 4326 -> Korea 5179 for true metres
+  { t: 'Proximity — nearest facilities (metres)', sql:
+`-- In-browser DuckDB has no PROJ grids, so skip ST_Transform and use
+-- ST_Distance_Sphere: true great-circle metres straight from lon/lat.
 SELECT name, s_type,
-  ST_Distance(
-    ST_Transform(geom, 'EPSG:4326', 'EPSG:5179'),
-    ST_Transform(ST_Point(126.9779, 37.5663), 'EPSG:4326', 'EPSG:5179')
-  )::INT AS metres_from_seoul_cityhall
+  ST_Distance_Sphere(geom, ST_Point(126.9779, 37.5663))::INT
+    AS metres_from_seoul_cityhall
 FROM hospitals
 ORDER BY metres_from_seoul_cityhall
 LIMIT 10;` },
-  { t: 'Buffer / service area as WKT', sql:
-`SELECT name,
-  ST_AsText(ST_Buffer(
-    ST_Transform(geom,'EPSG:4326','EPSG:5179'), 1000)) AS service_area_1km
+  { t: 'Within 5 km of a point (mirrors the buffer tool)', sql:
+`-- the SQL behind the Buffer & proximity tool above
+SELECT category, count(*) AS within_5km
+FROM hospitals
+WHERE ST_Distance_Sphere(geom, ST_Point(126.9779, 37.5663)) <= 5000
+GROUP BY category
+ORDER BY within_5km DESC;` },
+  { t: 'Service-area shapes — then "Plot result"', sql:
+`-- A buffer is just a grown polygon. In-browser DuckDB buffers in DEGREES
+-- (no projection); for true-metre service areas use PostGIS geography.
+-- Run this, then click "Plot result" to draw the shapes on the map.
+SELECT name, ST_Buffer(geom, 0.03) AS geom
 FROM hospitals
 WHERE category = 'General hospital'
-LIMIT 5;` },
+LIMIT 20;` },
   { t: 'General hospitals only', sql:
 `SELECT name, beds, address
 FROM hospitals
@@ -321,8 +328,14 @@ async function bootDuck() {
 
     duckStatus('Loading snapshot tables…');
     for (const cfg of LAYERS) {
-      await db.registerFileURL(cfg.file, new URL(DATA + cfg.file, location.href).href,
-        duckdb.DuckDBDataProtocol.HTTP, false);
+      // Hand DuckDB the COMPLETE file bytes in memory rather than letting it fetch
+      // over HTTP. GDAL's GeoJSON driver reads via range requests, and some static
+      // hosts (e.g. GitHub Pages, with compression) only deliver the first 16 KB
+      // chunk — truncating the JSON ("Unterminated object"). A full buffer is robust
+      // everywhere. (Reuse the already-fetched FeatureCollection to avoid a 2nd download.)
+      const fc = geojsonCache[cfg.id] || (await loadJSON(DATA + cfg.file));
+      const bytes = new TextEncoder().encode(JSON.stringify(fc));
+      await db.registerFileBuffer(cfg.file, bytes);
       // ST_Read flattens GeoJSON properties into columns + a `geom` column
       await conn.query(`CREATE TABLE ${cfg.id} AS SELECT * FROM ST_Read('${cfg.file}');`);
     }
@@ -331,7 +344,7 @@ async function bootDuck() {
     duckStatus('DuckDB ready · spatial extension loaded · 6 tables', 'ok');
   })().catch((err) => {
     console.error(err);
-    duckStatus('DuckDB/spatial failed to load (network or browser limit). The map & buffer tools still work. ' + err.message, 'err');
+    duckStatus('DuckDB SQL console unavailable here. The map & buffer tools still work. ' + err.message, 'err');
     throw err;
   });
   return duckBooting;
