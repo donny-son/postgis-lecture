@@ -619,6 +619,100 @@
         font-size: 0.9rem;
     }
 
+    /* —— lab boxes (hands-on exercises) —— */
+    .lab-box {
+        background-color: var(--color-clay-tint);
+        border: 1px solid var(--color-clay-soft);
+        border-left: 4px solid var(--color-clay);
+        border-radius: var(--radius-md);
+        padding: 1rem 1.1rem;
+        margin: 1.1rem 0;
+    }
+    .lab-head {
+        font-family: var(--font-display);
+        font-weight: 600;
+        color: var(--color-clay-deep);
+        margin-bottom: 0.4rem;
+    }
+    .lab-tag {
+        display: inline-block;
+        font-family: var(--font-body);
+        font-size: 0.62rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: oklch(98% 0.01 90);
+        background-color: var(--color-clay);
+        padding: 0.14rem 0.5rem;
+        border-radius: var(--radius-sm);
+        margin-right: 0.5rem;
+        vertical-align: middle;
+    }
+
+    /* —— track tags (SQL / Python / R / DuckDB / Docker) —— */
+    .track {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        padding: 0.12rem 0.5rem;
+        border-radius: 999px;
+        border: 1px solid currentColor;
+        vertical-align: middle;
+        margin: 0 0.15rem;
+        line-height: 1.5;
+    }
+    .track.sql    { color: var(--color-green-deep); background: var(--color-green-tint); }
+    .track.py     { color: var(--color-blue-deep);  background: var(--color-blue-tint); }
+    .track.r      { color: var(--color-clay-deep);  background: var(--color-clay-tint); }
+    .track.duck   { color: var(--color-gold-deep);  background: var(--color-gold-tint); }
+    .track.docker { color: var(--color-brick-deep); background: var(--color-brick-tint); }
+
+    /* —— numbered case-study / step rows (alias of workflow-step) —— */
+    .case-step { /* inherits .workflow-step layout */ }
+
+    /* —— agenda / objectives grid helpers —— */
+    .agenda-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem 1.5rem;
+        margin: 1rem 0;
+    }
+    .agenda-row {
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+        padding: 0.35rem 0;
+        border-bottom: 1px dashed var(--color-rule);
+        font-size: 0.92rem;
+    }
+    .agenda-row .agenda-num {
+        flex-shrink: 0;
+        width: 2rem;
+        font-family: var(--font-display);
+        font-weight: 600;
+        color: var(--color-green-deep);
+    }
+    .agenda-row .timing {
+        margin-left: auto;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--color-ink-faint);
+        white-space: nowrap;
+    }
+    @media (max-width: 768px) { .agenda-grid { grid-template-columns: 1fr; } }
+
+    /* —— two-column code layout —— */
+    .code-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+        align-items: start;
+    }
+    @media (max-width: 768px) { .code-grid { grid-template-columns: 1fr; } }
+
     /* —— mobile chrome —— */
     .mobile-header { background-color: var(--color-paper-2) !important; border-bottom: 1px solid var(--color-rule-strong) !important; }
     .mobile-overlay {
@@ -698,13 +792,14 @@
         <nav>
             <a href="#overview" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">I</span><span class="nav-label">Overview</span></a>
             <a href="#why-spatial-db" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">II</span><span class="nav-label">Why Spatial Databases?</span></a>
-            <a href="#postgis-basics" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">III</span><span class="nav-label">PostGIS Fundamentals</span></a>
-            <a href="#connecting" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">IV</span><span class="nav-label">Connecting &amp; Querying</span></a>
-            <a href="#modern-stack" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">V</span><span class="nav-label">Modern GIS Stack (2026)</span></a>
-            <a href="#use-cases" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">VI</span><span class="nav-label">Real-World Applications</span></a>
-            <a href="#gen-ai" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">VII</span><span class="nav-label">Learning GIS with AI</span></a>
-            <a href="#pop-quiz" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">VIII</span><span class="nav-label">Pop Quiz</span></a>
-            <a href="#summary-resources" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">IX</span><span class="nav-label">Summary &amp; Resources</span></a>
+            <a href="#setup" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">III</span><span class="nav-label">Setup — Your Lab</span></a>
+            <a href="#postgis-basics" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">IV</span><span class="nav-label">PostGIS Fundamentals</span></a>
+            <a href="#connecting" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">V</span><span class="nav-label">Connecting &amp; Querying</span></a>
+            <a href="#modern-stack" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">VI</span><span class="nav-label">Modern GIS Stack (2026)</span></a>
+            <a href="#case-study" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">VII</span><span class="nav-label">Case Study: Clinic Access</span></a>
+            <a href="#gen-ai" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">VIII</span><span class="nav-label">Learning GIS with AI</span></a>
+            <a href="#pop-quiz" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">IX</span><span class="nav-label">Pop Quiz</span></a>
+            <a href="#summary-resources" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">X</span><span class="nav-label">Summary &amp; Resources</span></a>
         </nav>
     </aside>
 
@@ -718,6 +813,53 @@
             </div>
             <div class="ai-tip">
                 <p><strong>📅 2026 revamp:</strong> This edition updates the material for the current geospatial ecosystem (PostGIS 3.6, PostgreSQL 18, GeoParquet, DuckDB, <code>psycopg</code> v3, GeoPandas 1.x) and adds a hands-on guide to <strong>learning and doing GIS with generative AI</strong>. New and updated content is marked with a <span class="badge-new">New</span> badge.</p>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">How to follow along</h2>
+            <p>This is a <strong>hands-on</strong> lecture: we alternate <em>concept → demo → you try it</em>. When you see a <span class="lab-tag">Lab</span> box, pause and run it yourself — solutions follow. Code is labelled by track so you can pick the one you know:</p>
+            <p class="mt-2"><span class="track sql">SQL</span> <span class="track py">Python</span> <span class="track r">R</span> <span class="track duck">DuckDB</span> <span class="track docker">Docker</span></p>
+            <div class="interactive-card mt-3">
+                <h3 class="text-lg font-semibold">Two ways to practice — set up either (or both) in Part III</h3>
+                <div class="interactive-card-content text-sm">
+                    <p>A zero-setup <strong>DuckDB</strong> track that runs on any laptop, and a full <strong>Docker PostGIS</strong> track for the real multi-user server experience. The spatial SQL is nearly identical across both.</p>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Learning objectives</h2>
+            <p>By the end of today, you should be able to:</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                <ul class="list-disc list-inside ml-4 my-2 text-neutral-600 space-y-1">
+                    <li><strong>Explain</strong> why spatial databases beat CSVs and shapefiles for research</li>
+                    <li><strong>Stand up</strong> a working PostGIS (Docker) and DuckDB spatial environment</li>
+                    <li><strong>Describe</strong> geometry types, SRIDs/CRS, geometry vs. geography</li>
+                    <li><strong>Create</strong> and use a spatial index — and read <code>EXPLAIN ANALYZE</code></li>
+                </ul>
+                <ul class="list-disc list-inside ml-4 my-2 text-neutral-600 space-y-1">
+                    <li><strong>Write</strong> spatial SQL: <code>ST_DWithin</code>, <code>ST_Intersects</code>, spatial joins, buffers</li>
+                    <li><strong>Connect</strong> from Python (<code>geopandas</code>) and R (<code>sf</code>)</li>
+                    <li><strong>Carry</strong> one public-health analysis end-to-end (clinic accessibility)</li>
+                    <li><strong>Use</strong> generative AI to draft, translate, and debug GIS work — and verify it</li>
+                </ul>
+            </div>
+            <div class="key-takeaway">
+                <p><strong>The throughline:</strong> the <em>spatial SQL</em> you learn today transfers across PostGIS, DuckDB, and AI-assisted workflows alike. Learn it once; use it everywhere.</p>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Today's agenda &amp; timing</h2>
+            <div class="agenda-grid">
+                <div class="agenda-row"><span class="agenda-num">I</span><span>Overview &amp; goals</span><span class="timing">~5 min</span></div>
+                <div class="agenda-row"><span class="agenda-num">II</span><span>Why spatial databases</span><span class="timing">~10 min</span></div>
+                <div class="agenda-row"><span class="agenda-num">III</span><span>Setup — your lab <span class="badge-new">Hands-on</span></span><span class="timing">~15 min</span></div>
+                <div class="agenda-row"><span class="agenda-num">IV</span><span>PostGIS fundamentals (deep)</span><span class="timing">~25 min</span></div>
+                <div class="agenda-row"><span class="agenda-num">V</span><span>Connecting &amp; querying</span><span class="timing">~15 min</span></div>
+                <div class="agenda-row"><span class="agenda-num">VI</span><span>Modern stack · then a break</span><span class="timing">~10 min</span></div>
+                <div class="agenda-row"><span class="agenda-num">VII</span><span>Case study end-to-end <span class="badge-new">Hands-on</span></span><span class="timing">~25 min</span></div>
+                <div class="agenda-row"><span class="agenda-num">VIII</span><span>GIS with generative AI <span class="badge-new">Hands-on</span></span><span class="timing">~20 min</span></div>
+                <div class="agenda-row"><span class="agenda-num">IX</span><span>Pop quiz</span><span class="timing">~10 min</span></div>
+                <div class="agenda-row"><span class="agenda-num">X</span><span>Summary &amp; resources</span><span class="timing">~5 min</span></div>
+            </div>
+            <div class="ai-tip">
+                <p><strong>Before we go further:</strong> if you can, start the Docker download now (Part III, the <code>docker run</code> command) — it pulls in the background while we cover concepts.</p>
             </div>
         </section>
 
@@ -820,6 +962,234 @@
             <div class="key-takeaway mt-4">
                 <p><strong>Key takeaway:</strong> Spatial databases offer a more robust, efficient, and powerful way to manage and analyze geographic health data, overcoming critical limitations of traditional file-based approaches.</p>
             </div>
+
+            <h2 class="text-2xl font-semibold mt-6">The question we'll answer all day</h2>
+            <p>To make this concrete, we'll carry <strong>one realistic analysis</strong> through the whole lecture.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-3">
+                <div class="interactive-card" style="cursor:default;">
+                    <p class="masthead-kicker" style="margin:0;">Running case study</p>
+                    <h3 class="text-lg font-semibold" style="color:var(--color-green-deep);">Clinic accessibility in Riverbend County</h3>
+                    <p class="text-sm mt-2">"How many people live within <strong>5 km</strong> of a primary-care clinic, and which <strong>districts</strong> are underserved relative to their population?"</p>
+                </div>
+                <div>
+                    <p class="text-sm">Our (synthetic) data — three tables we'll build in Part III:</p>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Table</th><th>Geometry</th><th>Key columns</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>clinics</code></td><td>Point (4326)</td><td><code>clinic_id</code>, <code>name</code></td></tr>
+                                <tr><td><code>districts</code></td><td>MultiPolygon (4326)</td><td><code>district_id</code>, <code>name</code>, <code>population</code></td></tr>
+                                <tr><td><code>blocks</code></td><td>Point (4326)</td><td><code>block_id</code>, <code>pop</code></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="lab-box">
+                <div class="lab-head"><span class="lab-tag">Note</span> Why synthetic data?</div>
+                We use <strong>synthetic</strong> data on purpose — never real patient locations in a teaching or AI context. More on that in Part VIII.
+            </div>
+        </section>
+
+        <section id="setup" class="content-section">
+            <h1 class="text-3xl font-bold mb-4">Setup — Your Lab Environment <span class="badge-new">Hands-on</span></h1>
+            <p class="mb-4 text-neutral-700">You'll get the most out of today if you can run queries yourself. Pick a track — or do both. The two engines share nearly identical spatial SQL, so the skill transfers either way.</p>
+
+            <h2 class="text-2xl font-semibold">Two tracks, one set of skills</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold"><span class="track duck">DuckDB</span> Zero-setup, local</h4>
+                    <ul class="list-disc list-inside ml-4 my-2 text-sm text-neutral-600">
+                        <li>One binary or <code>pip install</code> — <strong>no server</strong></li>
+                        <li>Runs spatial SQL inside Python / R / CLI</li>
+                        <li>Reads GeoParquet &amp; files directly</li>
+                        <li>Perfect for labs on any laptop</li>
+                    </ul>
+                    <p class="text-xs text-neutral-500">Best if you want to start immediately.</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold"><span class="track docker">Docker</span> Real PostGIS server</h4>
+                    <ul class="list-disc list-inside ml-4 my-2 text-sm text-neutral-600">
+                        <li>A genuine multi-user PostgreSQL + PostGIS</li>
+                        <li>Concurrency, roles, indexes, <code>EXPLAIN</code></li>
+                        <li>Mirrors a production research database</li>
+                        <li>Needs Docker Desktop installed</li>
+                    </ul>
+                    <p class="text-xs text-neutral-500">Best if you want the authentic workflow.</p>
+                </div>
+            </div>
+            <div class="key-takeaway">
+                <p><strong>The SQL is nearly identical.</strong> DuckDB's <code>spatial</code> extension implements the same <code>ST_*</code> functions. Learn the query once; run it in either engine.</p>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Track A — DuckDB in 60 seconds <span class="track duck">DuckDB</span></h2>
+            <p>The fastest path to running spatial SQL. No server, no accounts.</p>
+            <div class="code-grid">
+                <div>
+                    <p class="text-sm font-semibold mb-1">Option 1 — Python (what we'll use in labs)</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-python">pip install "duckdb>=1.1" "geopandas>=1.0"
+
+# then, in Python:
+import duckdb
+con = duckdb.connect("riverbend.duckdb")
+con.sql("INSTALL spatial; LOAD spatial;")
+con.sql("SELECT ST_Point(0, 0) AS p;").show()</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold mb-1">Option 2 — CLI (great for quick checks)</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-bash"># macOS / Linux
+brew install duckdb        # or download the binary
+duckdb riverbend.duckdb
+
+-- inside the DuckDB shell:
+INSTALL spatial; LOAD spatial;
+SELECT ST_AsText(ST_Point(-117.4, 33.9));
+-- POINT(-117.4 33.9)</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+            <div class="lab-box">
+                <div class="lab-head"><span class="lab-tag">Lab 0a</span> Verify DuckDB</div>
+                Run either snippet. If you see a <code>POINT</code> printed, your spatial engine works. ✅
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Track B — Docker PostGIS in one command <span class="track docker">Docker</span></h2>
+            <p>The official image bundles PostgreSQL 18 + PostGIS 3.6. One command, a real server.</p>
+            <div class="code-container relative">
+                <pre><code class="language-bash"># Pull &amp; run a PostGIS server (downloads ~600 MB the first time)
+docker run -d --name almanac-pg \
+  -e POSTGRES_PASSWORD=almanac \
+  -e POSTGRES_DB=riverbend \
+  -p 5432:5432 \
+  postgis/postgis:18-3.6</code></pre>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="code-grid">
+                <div>
+                    <p class="text-sm font-semibold mb-1">Connect with <code>psql</code> (inside the container)</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-bash">docker exec -it almanac-pg \
+  psql -U postgres -d riverbend
+
+-- Turn on PostGIS in this database (once)
+CREATE EXTENSION IF NOT EXISTS postgis;
+SELECT postgis_full_version();</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="ai-tip">
+                        <p><strong>Tip:</strong> <code>-d</code> runs it in the background. Stop/restart with <code>docker stop almanac-pg</code> / <code>docker start almanac-pg</code>. Your data persists in the container until you <code>docker rm</code> it.</p>
+                    </div>
+                    <div class="caution">
+                        <p><strong>Teaching only:</strong> a hard-coded password and open port are fine on your laptop — never on a shared or internet-facing host.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="lab-box">
+                <div class="lab-head"><span class="lab-tag">Lab 0b</span> Prove PostGIS is alive <span class="track sql">SQL</span></div>
+                Run this in <code>psql</code> (Docker) <em>or</em> the DuckDB shell. Both should return a version string and a valid point.
+            </div>
+            <div class="code-grid">
+                <div>
+                    <p class="text-sm font-semibold mb-1"><span class="track docker">Docker / PostGIS</span></p>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">SELECT postgis_version();
+-- 3.6 USE_GEOS=1 USE_PROJ=1 ...
+
+SELECT ST_AsText(
+  ST_SetSRID(ST_MakePoint(-117.4, 33.9), 4326)
+);
+-- POINT(-117.4 33.9)</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold mb-1"><span class="track duck">DuckDB</span></p>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">LOAD spatial;
+SELECT version();        -- v1.1+
+
+SELECT ST_AsText(
+  ST_Point(-117.4, 33.9)
+);
+-- POINT (-117.4 33.9)</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Loading the sample data <span class="track sql">SQL</span></h2>
+            <p>We'll generate the synthetic Riverbend tables directly in SQL, so everyone has identical data.</p>
+            <div class="code-grid">
+                <div>
+                    <p class="text-sm font-semibold mb-1">Clinics — a handful of points</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">CREATE TABLE clinics (
+  clinic_id int PRIMARY KEY,
+  name      text,
+  geom      geometry(Point, 4326)
+);
+
+INSERT INTO clinics VALUES
+ (1,'Riverbend Family Health',
+    ST_SetSRID(ST_MakePoint(-117.40, 33.95),4326)),
+ (2,'Eastside Community Clinic',
+    ST_SetSRID(ST_MakePoint(-117.31, 33.92),4326)),
+ (3,'North Valley Health Center',
+    ST_SetSRID(ST_MakePoint(-117.36, 34.02),4326));</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold mb-1">Blocks — population points (a grid)</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">CREATE TABLE blocks AS
+SELECT
+  row_number() OVER () AS block_id,
+  (50 + (random()*450))::int AS pop,
+  ST_SetSRID(ST_MakePoint(
+    -117.45 + gx*0.01,
+     33.88 + gy*0.01), 4326) AS geom
+FROM generate_series(0,18) gx,
+     generate_series(0,16) gy;</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <p class="text-xs text-neutral-500 mt-1">~300 population points across the county. (DuckDB: use <code>range()</code> instead of <code>generate_series</code> in a cross join — the AI can translate it; see Part VIII.)</p>
+                </div>
+            </div>
+            <p class="text-sm font-semibold mb-1 mt-3">Districts — simple square cells acting as administrative areas</p>
+            <div class="code-container relative">
+                <pre><code class="language-sql">CREATE TABLE districts AS
+SELECT
+  d AS district_id,
+  'District ' || d AS name,
+  (8000 + (random()*40000))::int AS population,
+  ST_SetSRID(
+    ST_MakeEnvelope(                        -- xmin, ymin, xmax, ymax
+      -117.45 + (d%3)*0.10,  33.88 + (d/3)*0.08,
+      -117.35 + (d%3)*0.10,  33.96 + (d/3)*0.08
+    ), 4326) AS geom
+FROM generate_series(0,5) d;</code></pre>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-1">
+                <div class="key-takeaway">
+                    <p><strong>You now have three layers:</strong> <code>clinics</code> (points), <code>blocks</code> (population points), and <code>districts</code> (polygons) — all in <strong>SRID 4326</strong>. This is the data for our case study in Part VII.</p>
+                </div>
+                <div class="ai-tip">
+                    <p><strong>Prefer real files?</strong> The same tables ship as GeoParquet in the course pack. DuckDB can read them straight from a URL or disk — <code>SELECT * FROM 'clinics.parquet';</code> — no import step needed.</p>
+                </div>
+            </div>
+            <div class="lab-box">
+                <div class="lab-head"><span class="lab-tag">Lab 0c</span> Create the tables</div>
+                Run all three blocks. Then: <code>SELECT count(*) FROM blocks;</code> — expect ~323 rows.
+            </div>
         </section>
 
         <section id="postgis-basics" class="content-section">
@@ -867,7 +1237,43 @@
                     </div>
                 </div>
             </div>
-            <p class="mt-2 text-sm text-neutral-600">PostGIS also supports Multi-geometries (MultiPoint, MultiLineString, MultiPolygon) which are collections of the same geometry type.</p>
+            <p class="mt-2 text-sm text-neutral-600">PostGIS also supports Multi-geometries (MultiPoint, MultiLineString, MultiPolygon) which are collections of the same geometry type, plus GeometryCollections.</p>
+
+            <h3 class="text-xl font-semibold mt-6">How geometries are written — WKT &amp; WKB</h3>
+            <p>Every geometry has a human-readable and a binary form. You'll see both constantly.</p>
+            <div class="code-grid">
+                <div>
+                    <p class="text-sm font-semibold mb-1">WKT — <em>Well-Known Text</em> (readable)</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">POINT(-117.4 33.9)
+LINESTRING(0 0, 1 1, 2 1)
+POLYGON((0 0, 4 0, 4 4, 0 4, 0 0))
+
+-- Constructing &amp; inspecting
+SELECT ST_AsText(            -- geometry → WKT
+  ST_GeomFromText('POINT(-117.4 33.9)', 4326)
+);
+SELECT ST_AsGeoJSON(geom)    -- → GeoJSON for web maps
+FROM clinics LIMIT 1;</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="interactive-card" style="cursor:default;">
+                        <p class="text-sm"><strong>WKB</strong> (<em>Well-Known Binary</em>) is the compact form actually stored on disk. You rarely write it by hand — functions convert for you.</p>
+                    </div>
+                    <div class="ai-tip">
+                        <p><strong>Constructor cheat-sheet:</strong><br>
+                        <code>ST_MakePoint(x, y)</code> — fast point<br>
+                        <code>ST_SetSRID(geom, 4326)</code> — stamp a CRS<br>
+                        <code>ST_GeomFromText(wkt, srid)</code> — from WKT<br>
+                        <code>ST_AsText / ST_AsGeoJSON</code> — read it back</p>
+                    </div>
+                </div>
+            </div>
+            <div class="caution">
+                <p><strong>Order matters:</strong> WKT and <code>ST_MakePoint</code> are <strong>(longitude, latitude)</strong> — X then Y. Reversing them silently puts your data in the wrong hemisphere.</p>
+            </div>
 
             <h3 class="text-xl font-semibold mt-6">2. Spatial Reference Systems (SRS) / SRID</h3>
             <p>An SRS (or CRS) defines how coordinate values relate to actual locations on Earth. It's the "language" or "map projection" your data speaks.</p>
@@ -900,16 +1306,176 @@
                 <p class="text-xs text-center mt-2 text-neutral-500">Illustrates that layers with different SRIDs won't overlay correctly unless transformed to a common system.</p>
             </div>
 
+            <h3 class="text-xl font-semibold mt-6">The classic trap — degrees are not meters</h3>
+            <p>Distance on lat/lon (SRID 4326) is measured in <strong>degrees</strong>, which is almost never what you want.</p>
+            <div class="code-grid">
+                <div>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">-- WRONG: "0.045" — that's degrees, meaningless
+SELECT ST_Distance(
+  ST_SetSRID(ST_MakePoint(-117.40,33.95),4326),
+  ST_SetSRID(ST_MakePoint(-117.36,34.02),4326)
+);
 
-            <h3 class="text-xl font-semibold mt-6">3. Spatial Indexes (Briefly)</h3>
-            <p>Like an index in a book, but for locations. They dramatically speed up spatial queries (e.g., "what's near X?", "what's inside Y?").</p>
+-- RIGHT (option 1): transform to a metric CRS
+SELECT ST_Distance(
+  ST_Transform(a.geom, 32611),   -- UTM 11N, meters
+  ST_Transform(b.geom, 32611)
+) FROM clinics a, clinics b
+WHERE a.clinic_id=1 AND b.clinic_id=3;
+-- ≈ 8100  (meters)</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">-- RIGHT (option 2): cast to geography
+-- (meters on a sphere)
+SELECT ST_Distance(
+  a.geom::geography,
+  b.geom::geography
+) FROM clinics a, clinics b
+WHERE a.clinic_id=1 AND b.clinic_id=3;
+-- ≈ 8120  (meters)</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <div class="caution">
+                        <p><strong>If a distance looks like 0.0x</strong>, you're in degrees. Transform to a projected CRS (e.g. the right UTM zone) or cast to <code>geography</code>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold mt-6">geometry vs. geography — which to use</h3>
+            <p>PostGIS offers two spatial types. Choosing well saves you from the degrees-vs-meters trap.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold"><code>geometry</code> — Cartesian (flat)</h4>
+                    <ul class="list-disc list-inside ml-4 my-2 text-sm text-neutral-600">
+                        <li>Math on a <strong>flat plane</strong> — fast</li>
+                        <li>Units are the CRS's units (degrees for 4326, meters for UTM)</li>
+                        <li>Hundreds of functions; the default for analysis</li>
+                        <li><strong>Best when</strong> your data is in a projected CRS, or covers a small area</li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold"><code>geography</code> — geodetic (round Earth)</h4>
+                    <ul class="list-disc list-inside ml-4 my-2 text-sm text-neutral-600">
+                        <li>Math on the <strong>spheroid</strong> — distances/areas in <strong>meters</strong>, always</li>
+                        <li>Correct over long distances &amp; across UTM zones</li>
+                        <li>Fewer functions, somewhat slower</li>
+                        <li><strong>Best when</strong> data spans large areas in lat/lon and you want true meters</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="key-takeaway">
+                <p><strong>Rule of thumb:</strong> national or continental lat/lon data and you want meters → <code>geography</code>. Local analysis or you've projected to UTM/State Plane → <code>geometry</code>. You can cast between them: <code>geom::geography</code>.</p>
+            </div>
+
+            <h3 class="text-xl font-semibold mt-6">3. Spatial indexes</h3>
+            <p>Like a book's index — but for <strong>locations</strong>. They dramatically speed up spatial queries ("what's near X?", "what's inside Y?").</p>
             <ul class="list-disc list-inside ml-4 my-2 text-neutral-600">
-                <li><strong>Analogy:</strong> A GPS for the database to rapidly find spatial data.</li>
-                <li><strong>How (simplified):</strong> Pre-processes and organizes spatial data (often using bounding boxes) so the database doesn't have to scan everything. Uses structures like R-Trees.</li>
-                <li><strong>Usage:</strong> You create a spatial index on geometry columns. PostGIS query planner uses it automatically.</li>
+                <li><strong>Analogy:</strong> a GPS that lets the database rapidly find spatial data.</li>
+                <li><strong>How (simplified):</strong> PostGIS builds a <strong>GiST</strong> index over each geometry's <strong>bounding box</strong> (an R-Tree), so the planner skips most rows.</li>
+                <li><strong>Two-phase search:</strong> a fast <em>index filter</em> on bounding boxes, then an <em>exact</em> check on the survivors.</li>
             </ul>
+            <div class="code-container relative">
+                <pre><code class="language-sql">-- Build a spatial index (do this on every geometry column you query)
+CREATE INDEX blocks_geom_idx ON blocks USING GIST (geom);
+ANALYZE blocks;            -- refresh planner statistics</code></pre>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="key-takeaway">
+                <p><strong>Functions that use the index automatically:</strong> <code>ST_DWithin</code>, <code>ST_Intersects</code>, <code>ST_Contains</code>, <code>&amp;&amp;</code> — because they begin with a bounding-box test. <code>ST_Distance</code> alone does <em>not</em>; prefer <code>ST_DWithin</code> for proximity.</p>
+            </div>
+
+            <h3 class="text-xl font-semibold mt-6">Proving the index works — <code>EXPLAIN ANALYZE</code></h3>
+            <p>The planner tells you whether it used your index. Reading this is a core skill.</p>
+            <div class="code-grid">
+                <div>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">EXPLAIN ANALYZE
+SELECT b.block_id
+FROM blocks b, clinics c
+WHERE c.clinic_id = 1
+  AND ST_DWithin(
+        b.geom::geography,
+        c.geom::geography, 5000);</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+                <div class="text-sm">
+                    <p>What to look for:</p>
+                    <ul class="list-disc list-inside ml-4 my-2 text-neutral-600">
+                        <li>✅ <strong><code>Index Scan using blocks_geom_idx</code></strong> — good, the index is used</li>
+                        <li>⚠️ <strong><code>Seq Scan</code></strong> on a big table — the index was skipped (missing index, wrong type, or a function wrapping the column)</li>
+                        <li><strong><code>actual time=</code></strong> — real milliseconds; compare before/after adding the index</li>
+                        <li><strong><code>rows=</code></strong> — estimate vs. actual; large gaps mean stale stats → run <code>ANALYZE</code></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="lab-box">
+                <div class="lab-head"><span class="lab-tag">Lab 1</span> Index &amp; explain <span class="track sql">SQL</span></div>
+                Create <code>blocks_geom_idx</code>, run the <code>EXPLAIN ANALYZE</code> above, and note the time. Drop the index, re-run, and compare. (DuckDB users: skip — it auto-indexes; focus on the query.)
+            </div>
+
+            <h3 class="text-xl font-semibold mt-6">Spatial relationships — the vocabulary</h3>
+            <p>Most spatial questions reduce to a handful of relationship predicates. They return <code>true</code>/<code>false</code>.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-3">
+                <div class="table-container" style="margin:0;">
+                    <table>
+                        <thead><tr><th>Function</th><th>Asks…</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>ST_Intersects(a,b)</code></td><td>do they touch/overlap at all?</td></tr>
+                            <tr><td><code>ST_Contains(a,b)</code></td><td>is <strong>b</strong> fully inside <strong>a</strong>?</td></tr>
+                            <tr><td><code>ST_Within(a,b)</code></td><td>is <strong>a</strong> fully inside <strong>b</strong>?</td></tr>
+                            <tr><td><code>ST_DWithin(a,b,d)</code></td><td>are they within distance <strong>d</strong>?</td></tr>
+                            <tr><td><code>ST_Touches(a,b)</code></td><td>do they share only a boundary?</td></tr>
+                            <tr><td><code>ST_Crosses(a,b)</code></td><td>does a line cross a polygon?</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <div class="interactive-card" style="cursor:default;">
+                        <p class="text-sm">Under the hood these implement the <strong>DE-9IM</strong> model — a 3×3 matrix describing how two geometries' interiors, boundaries, and exteriors relate. You rarely write DE-9IM directly, but it's why the named predicates are precise and composable.</p>
+                    </div>
+                    <div class="ai-tip">
+                        <p><strong>Measurement companions:</strong> <code>ST_Distance</code>, <code>ST_Length</code>, <code>ST_Area</code>, <code>ST_Buffer</code>, <code>ST_Intersection</code>, <code>ST_Union</code>, <code>ST_Centroid</code>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold mt-6">The workhorse — spatial joins</h3>
+            <p>A <strong>spatial join</strong> connects two tables by a spatial relationship instead of a shared key. This is where PostGIS earns its keep.</p>
+            <div class="code-grid">
+                <div>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">-- Count population points inside each district
+SELECT d.name,
+       count(b.*)      AS n_blocks,
+       sum(b.pop)      AS people
+FROM districts d
+JOIN blocks b
+  ON ST_Contains(d.geom, b.geom)   -- the join!
+GROUP BY d.name
+ORDER BY people DESC;</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+                <div class="text-sm">
+                    <p>How it works:</p>
+                    <ul class="list-disc list-inside ml-4 my-2 text-neutral-600">
+                        <li>The <code>ON</code> clause uses a <strong>spatial predicate</strong>, not <code>a.id = b.id</code></li>
+                        <li>The planner uses the GiST index to avoid comparing every pair</li>
+                        <li><code>JOIN</code> keeps matches; <code>LEFT JOIN</code> keeps districts with <strong>zero</strong> points too (watch for those!)</li>
+                    </ul>
+                    <div class="key-takeaway">
+                        <p><strong>Pattern to memorize:</strong> <em>points-in-polygons</em> via <code>JOIN … ON ST_Contains(poly, pt)</code> + <code>GROUP BY</code>. It answers a huge share of public-health questions.</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="key-takeaway mt-4">
-                <p><strong>Key takeaway:</strong> PostGIS stores geographic shapes (geometries) and understands their real-world coordinate systems (SRIDs), using spatial indexes to enable powerful and efficient spatial analysis.</p>
+                <p><strong>Part IV key takeaway:</strong> PostGIS stores shapes (geometries) with a real-world coordinate system (SRID), lets you choose <code>geometry</code> (flat, fast) or <code>geography</code> (true meters), uses <strong>GiST spatial indexes</strong> to stay fast, and answers questions through <strong>relationship predicates and spatial joins</strong>. Watch the two classic traps: <strong>degrees vs. meters</strong>, and <strong>queries that skip the index</strong> (<code>EXPLAIN ANALYZE</code> is your friend).</p>
             </div>
         </section>
 
@@ -1034,6 +1600,54 @@ print(health_data_gdf.head())
             <div class="key-takeaway mt-4">
                 <p><strong>Key takeaway:</strong> Learning basic SQL, augmented with PostGIS's spatial functions, unlocks the ability to perform powerful and efficient data selection and manipulation directly within the database.</p>
             </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Same skills, no server — DuckDB from Python <span class="track duck">DuckDB</span> <span class="track py">Python</span></h2>
+            <p>The identical analysis, running in-process over your local tables or files — no database server required.</p>
+            <div class="code-container relative">
+                <pre><code class="language-python">import duckdb, geopandas as gpd
+
+con = duckdb.connect("riverbend.duckdb")
+con.sql("LOAD spatial;")
+
+# The SAME spatial SQL you'd run in PostGIS
+df = con.sql("""
+  SELECT d.name, sum(b.pop) AS people
+  FROM districts d
+  JOIN blocks b ON ST_Contains(d.geom, b.geom)
+  GROUP BY d.name ORDER BY people DESC
+""").df()
+
+# Read big open data with zero import:
+con.sql("SELECT count(*) FROM 'overture_places.parquet'")</code></pre>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="key-takeaway">
+                <p><strong>Notice:</strong> the <code>ST_Contains</code> spatial join is byte-for-byte the same as the PostGIS version. <em>That's the payoff of learning spatial SQL once.</em></p>
+            </div>
+
+            <div class="lab-box">
+                <div class="lab-head"><span class="lab-tag">Lab 2</span> Your first end-to-end query <span class="track py">Python</span> <span class="track sql">SQL</span></div>
+                <ol class="list-decimal list-inside ml-1 my-1">
+                    <li>Connect from Python (PostGIS engine <em>or</em> DuckDB connection).</li>
+                    <li>Run the population-per-district spatial join.</li>
+                    <li>Print the busiest district. Bonus: <code>gdf.explore()</code> to see it on a map.</li>
+                </ol>
+            </div>
+            <div class="code-container relative">
+                <pre><code class="language-python"># Works against either engine — just change how you read:
+sql = """SELECT d.name, sum(b.pop) AS people
+         FROM districts d
+         JOIN blocks b ON ST_Contains(d.geom, b.geom)
+         GROUP BY d.name ORDER BY people DESC"""
+
+# PostGIS:  df = gpd.read_postgis(sql, engine)
+# DuckDB :  df = con.sql(sql).df()
+print(df.head(1))     # -> the most-populated district</code></pre>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="ai-tip">
+                <p><strong>Checkpoint:</strong> you've now connected, run a spatial join, and pulled results into a dataframe — the core loop of every analysis to come. (For our Docker server: host <code>localhost</code>, port <code>5432</code>, db <code>riverbend</code>, user <code>postgres</code>, password <code>almanac</code>.)</p>
+            </div>
         </section>
 
         <section id="modern-stack" class="content-section">
@@ -1124,48 +1738,203 @@ print(health_data_gdf.head())
             <div class="key-takeaway mt-4">
                 <p><strong>Key takeaway:</strong> Think in terms of a <em>stack</em>, not a single tool. PostGIS is your durable, shared spatial database; DuckDB and GeoParquet make ad-hoc, large-scale, and cloud analysis fast and cheap; GeoPandas/sf remain your interactive analysis home. The spatial SQL you learn for PostGIS transfers across much of this ecosystem.</p>
             </div>
+            <div class="lab-box">
+                <div class="lab-head"><span class="lab-tag">Break</span> ☕ 5 minutes</div>
+                When we return: we build the full clinic-accessibility analysis end-to-end on your data (Part VII).
+            </div>
         </section>
 
-        <section id="use-cases" class="content-section">
-            <h1 class="text-3xl font-bold mb-4">Real-World Applications</h1>
-            <p class="mb-4 text-neutral-700">This section explores common public health scenarios where PostGIS and its spatial SQL capabilities can answer specific research questions, moving beyond simple mapping to sophisticated spatial epidemiology.</p>
+        <section id="case-study" class="content-section">
+            <h1 class="text-3xl font-bold mb-4">Case Study — Clinic Accessibility <span class="badge-new">Hands-on</span></h1>
+            <p class="mb-4 text-neutral-700">One question, carried end-to-end on your own Riverbend database. We'll answer it in <strong>five steps</strong>, each a short lab. By the end you'll have a reusable accessibility pipeline — every step runnable in PostGIS <em>or</em> DuckDB.</p>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="p-6 bg-white rounded-xl shadow-lg">
-                    <h3 class="text-xl font-semibold mb-2">Use Case 1: Disease Surveillance & Cluster Analysis</h3>
-                    <p class="text-sm text-neutral-600 mb-1"><strong>Question:</strong> Where are disease cases concentrated? Are there more cases in District A vs. B (accounting for population)?</p>
-                    <p class="text-sm text-neutral-600 mb-1"><strong>PostGIS Role:</strong> Store case locations (points) and administrative boundaries (polygons).</p>
-                    <p class="text-sm text-neutral-600 mb-1"><strong>Conceptual SQL/Function:</strong> `ST_Contains(district_geom, case_geom)` to count points in polygons. Aggregate by district, calculate rates using population data.</p>
-                    <div class="mt-3 p-3 border border-dashed border-emerald-300 rounded-md bg-emerald-50">
-                        <p class="font-medium text-emerald-700 text-center">Conceptual Map: Disease Cases in Districts</p>
-                        <p class="text-xs text-emerald-600 text-center mt-1">Imagine a map with district polygons. Points representing disease cases are overlaid. Districts are color-coded by disease rate (cases per population).</p>
+            <div class="agenda-grid">
+                <div class="agenda-row"><span class="agenda-num">1</span><span><strong>Inventory &amp; sanity-check</strong> the data — counts, SRIDs, validity</span></div>
+                <div class="agenda-row"><span class="agenda-num">2</span><span><strong>Proximity</strong> — population within 5 km of any clinic</span></div>
+                <div class="agenda-row"><span class="agenda-num">3</span><span><strong>Service areas</strong> — buffers and what they cover</span></div>
+                <div class="agenda-row"><span class="agenda-num">4</span><span><strong>Aggregate by district</strong> — access rate per population</span></div>
+                <div class="agenda-row"><span class="agenda-num">5</span><span><strong>Validate</strong> — sanity checks before we trust it</span></div>
+            </div>
+            <div class="key-takeaway">
+                <p><strong>Question:</strong> "How many people live within 5 km of a clinic, and which districts are underserved relative to population?"</p>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Step 1 — inventory &amp; sanity-check <span class="track sql">SQL</span></h2>
+            <p>Before any analysis: confirm what you have. Counts, coordinate systems, and validity.</p>
+            <div class="code-grid">
+                <div>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">-- How much data, and what SRID?
+SELECT 'clinics' t, count(*), ST_SRID(geom) FROM clinics GROUP BY 3
+UNION ALL
+SELECT 'blocks', count(*), ST_SRID(geom) FROM blocks GROUP BY 3
+UNION ALL
+SELECT 'districts', count(*), ST_SRID(geom) FROM districts GROUP BY 3;
+
+-- Any invalid polygons? (real data often has them)
+SELECT district_id
+FROM districts
+WHERE NOT ST_IsValid(geom);</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     </div>
                 </div>
-
-                <div class="p-6 bg-white rounded-xl shadow-lg">
-                    <h3 class="text-xl font-semibold mb-2">Use Case 2: Healthcare Accessibility</h3>
-                    <p class="text-sm text-neutral-600 mb-1"><strong>Question:</strong> How many households are within 5km of a clinic? Which clinics serve a specific neighborhood?</p>
-                    <p class="text-sm text-neutral-600 mb-1"><strong>PostGIS Role:</strong> Store clinic locations (points), household locations (points) or census block centroids/polygons.</p>
-                    <p class="text-sm text-neutral-600 mb-1"><strong>Conceptual SQL/Function:</strong> `ST_DWithin(clinic_geom, household_geom, 5000)` for proximity. `ST_Buffer(clinic_geom, 5000)` to create service areas, then `ST_Intersects` with neighborhoods.</p>
-                     <div class="mt-3 p-3 border border-dashed border-emerald-300 rounded-md bg-emerald-50">
-                        <p class="font-medium text-emerald-700 text-center">Conceptual Map: Clinic Access</p>
-                        <p class="text-xs text-emerald-600 text-center mt-1">Imagine clinic points with 5km circular buffers. Households or census blocks are shown, highlighted if they fall within a buffer, indicating access.</p>
-                    </div>
-                </div>
-
-                <div class="p-6 bg-white rounded-xl shadow-lg">
-                    <h3 class="text-xl font-semibold mb-2">Use Case 3: Environmental Exposure Assessment</h3>
-                    <p class="text-sm text-neutral-600 mb-1"><strong>Question:</strong> Which communities are exposed to pollutants from a specific industrial site (e.g., within a 2km buffer)? Estimated population exposed?</p>
-                    <p class="text-sm text-neutral-600 mb-1"><strong>PostGIS Role:</strong> Store pollution source (point/polygon), community boundaries (polygons with population attributes).</p>
-                    <p class="text-sm text-neutral-600 mb-1"><strong>Conceptual SQL/Function:</strong> `ST_Buffer(source_geom, 2000)` for exposure zone. `ST_Intersects` with community polygons. `ST_Intersection` to estimate exposed population proportion.</p>
-                     <div class="mt-3 p-3 border border-dashed border-emerald-300 rounded-md bg-emerald-50">
-                        <p class="font-medium text-emerald-700 text-center">Conceptual Map: Exposure Zones</p>
-                        <p class="text-xs text-emerald-600 text-center mt-1">Imagine an industrial site, a 2km buffer around it. Community polygons (e.g., census tracts) are shown, highlighted if they overlap the buffer.</p>
+                <div class="text-sm">
+                    <p>What we're checking:</p>
+                    <ul class="list-disc list-inside ml-4 my-2 text-neutral-600">
+                        <li><strong>All three layers share SRID 4326</strong> → they'll align without transforming</li>
+                        <li><strong>Row counts</strong> match what we loaded (~3 / ~323 / 6)</li>
+                        <li><strong>No invalid geometries</strong> — if any, fix with <code>ST_MakeValid(geom)</code></li>
+                    </ul>
+                    <div class="lab-box">
+                        <div class="lab-head"><span class="lab-tag">Lab 3.1</span></div>
+                        Run both queries. Confirm matching SRIDs and zero invalid rows before continuing.
                     </div>
                 </div>
             </div>
-            <div class="key-takeaway mt-6">
-                <p><strong>Key takeaway:</strong> PostGIS enables sophisticated spatial questions relevant to public health to be answered efficiently, often by performing complex calculations directly in the database using spatial SQL, leading to actionable insights.</p>
+
+            <h2 class="text-2xl font-semibold mt-6">Step 2 — population within 5 km of a clinic <span class="track sql">SQL</span></h2>
+            <p>The core accessibility measure: which population points are "served"?</p>
+            <div class="code-container relative">
+                <pre><code class="language-sql">-- Mark each block as served / unserved, using true meters via geography
+SELECT
+  sum(pop)                                   AS total_pop,
+  sum(pop) FILTER (WHERE served)             AS served_pop,
+  round(100.0 * sum(pop) FILTER (WHERE served) / sum(pop), 1) AS pct_served
+FROM (
+  SELECT b.pop,
+         EXISTS (
+           SELECT 1 FROM clinics c
+           WHERE ST_DWithin(b.geom::geography, c.geom::geography, 5000)
+         ) AS served
+  FROM blocks b
+) s;</code></pre>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-1">
+                <div class="key-takeaway">
+                    <p><strong>Why <code>ST_DWithin</code> + <code>::geography</code>:</strong> it uses the spatial index <em>and</em> measures real meters — both traps from Part IV, avoided in one line.</p>
+                </div>
+                <div class="lab-box">
+                    <div class="lab-head"><span class="lab-tag">Lab 3.2</span></div>
+                    Run it. What % of the county is within 5 km of a clinic? Try 3 km and 10 km — how sensitive is access to the threshold?
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Step 3 — service areas as buffers <span class="track sql">SQL</span></h2>
+            <p>Sometimes you want the <strong>zone</strong> itself — to map it, or intersect it with other layers.</p>
+            <div class="code-grid">
+                <div>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">-- A 5 km service area around each clinic
+SELECT clinic_id,
+       ST_Buffer(geom::geography, 5000)::geometry AS svc
+FROM clinics;
+
+-- Union them into one combined coverage polygon
+SELECT ST_Union(
+         ST_Buffer(geom::geography, 5000)::geometry
+       ) AS coverage
+FROM clinics;</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+                <div class="text-sm">
+                    <ul class="list-disc list-inside ml-4 my-2 text-neutral-600">
+                        <li><code>ST_Buffer</code> on <code>geography</code> grows a true-meter zone</li>
+                        <li><code>ST_Union</code> dissolves overlapping buffers into one coverage shape</li>
+                        <li>Export <code>coverage</code> as GeoJSON to drop onto a web map, or intersect it with districts (next step)</li>
+                    </ul>
+                    <div class="caution">
+                        <p><strong>Buffers are approximations</strong> of circles (segmented polygons) and ignore roads/terrain. For travel-time access you'd use a routing service — note the assumption.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Step 4 — access rate by district <span class="track sql">SQL</span></h2>
+            <p>Now the decision-relevant output: a <strong>rate per district</strong>, so we compare fairly across populations.</p>
+            <div class="code-container relative">
+                <pre><code class="language-sql">SELECT
+  d.name,
+  d.population,
+  sum(b.pop)                                   AS pop_in_blocks,
+  sum(b.pop) FILTER (WHERE served)             AS served_pop,
+  round(100.0 * sum(b.pop) FILTER (WHERE served)
+        / nullif(sum(b.pop),0), 1)             AS pct_served
+FROM districts d
+JOIN blocks b ON ST_Contains(d.geom, b.geom)        -- points-in-polygons
+CROSS JOIN LATERAL (
+  SELECT EXISTS (SELECT 1 FROM clinics c
+    WHERE ST_DWithin(b.geom::geography, c.geom::geography, 5000)) AS served
+) x
+GROUP BY d.name, d.population
+ORDER BY pct_served ASC;          -- worst-served first</code></pre>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="lab-box">
+                <div class="lab-head"><span class="lab-tag">Lab 3.3</span></div>
+                Run it. Which two districts are <strong>least</strong> served? Those are where you'd target a new clinic.
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Step 5 — validate before you trust it <span class="track sql">SQL</span></h2>
+            <p>A number is not an answer until you've checked it. Build the habit now.</p>
+            <div class="code-grid">
+                <div class="text-sm">
+                    <p><strong>Cross-checks:</strong></p>
+                    <ul class="list-disc list-inside ml-4 my-2 text-neutral-600">
+                        <li><strong>Totals reconcile</strong> — does <code>sum(served) ≤ total_pop</code>? Does district pop roughly match <code>population</code>?</li>
+                        <li><strong>Spot a known case</strong> — pick one block next to a clinic; is it flagged served?</li>
+                        <li><strong>Boundary effects</strong> — blocks near the county edge may have clinics <em>just outside</em> your data → undercount</li>
+                        <li><strong>Units</strong> — distances in meters? <code>geography</code> confirms it</li>
+                        <li><strong>Sensitivity</strong> — does the ranking hold at 3 km vs 5 km?</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">-- One block you can reason about by hand
+SELECT b.block_id,
+  ST_Distance(b.geom::geography,
+              c.geom::geography)::int AS m
+FROM blocks b
+JOIN clinics c ON c.clinic_id = 1
+ORDER BY m
+LIMIT 3;       -- nearest blocks to clinic 1</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <div class="key-takeaway">
+                        <p><strong>Validation is the analyst's job</strong> — not the database's, and certainly not the AI's.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Extending the pattern — more public-health questions</h2>
+            <p>The same building blocks answer many questions. Notice the recurring verbs: <em>contain, within-distance, buffer, intersect, aggregate.</em></p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-3">
+                <div class="p-6 bg-white rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-2">🦠 Disease surveillance &amp; clusters</h3>
+                    <p class="text-sm text-neutral-600 mb-2">Cases (points) in districts (polygons), normalized by population.</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">SELECT d.name, count(c.*) AS cases
+FROM districts d
+JOIN cases c ON ST_Contains(d.geom,c.geom)
+GROUP BY d.name;     -- ÷ population → rate</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+                <div class="p-6 bg-white rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-2">🏭 Environmental exposure</h3>
+                    <p class="text-sm text-neutral-600 mb-2">Who lives inside a pollutant buffer?</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">SELECT sum(b.pop) AS exposed
+FROM blocks b, sources s
+WHERE ST_DWithin(
+  b.geom::geography,
+  s.geom::geography, 2000);   -- 2 km</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+            <div class="key-takeaway mt-4">
+                <p><strong>Key takeaway:</strong> PostGIS answers sophisticated spatial questions efficiently — and once you know the handful of core predicates, new questions are recombinations of the same moves.</p>
             </div>
         </section>
 
@@ -1254,6 +2023,30 @@ Write one SQL query that returns each district's name, case count, and cases per
                 <span class="prompt-label">Plan &amp; sanity-check an analysis</span>
                 <button class="prompt-copy-btn" onclick="copyPrompt(this)">Copy</button>
                 <div class="prompt-text">I want to [RESEARCH GOAL, e.g. "estimate how many people live within 5 km of a clinic in County X"]. I have [DESCRIBE DATA]. Propose a step-by-step PostGIS workflow, flag the assumptions and CRS/units decisions, and tell me three checks I can run to confirm the results are sensible before I trust them.</div>
+            </div>
+
+            <div class="lab-box">
+                <div class="lab-head"><span class="lab-tag">Lab 4</span> Prompt → run → verify <span class="track py">Python</span> <span class="track sql">SQL</span></div>
+                <p>Using your own Riverbend schema, ask an AI assistant to write the <strong>5 km access rate by district</strong> query (our Step 4). Then <strong>verify</strong> it against the answer you already have.</p>
+                <div class="prompt-box" style="margin-top:0.75rem;">
+                    <span class="prompt-label">Your prompt</span>
+                    <button class="prompt-copy-btn" onclick="copyPrompt(this)">Copy</button>
+                    <div class="prompt-text">You are a PostGIS 3.6 expert helping a public-health researcher. Tables (all SRID 4326):
+- clinics(clinic_id, name, geom Point)
+- blocks(block_id, pop, geom Point)
+- districts(district_id, name, population, geom Polygon)
+Write ONE query: per district, the % of block population within 5 km of any clinic. Use meters, use the spatial index, and explain each line.</div>
+                </div>
+                <p class="text-sm mt-2"><strong>Then check the AI's output against reality:</strong></p>
+                <ol class="list-decimal list-inside ml-1 my-1 text-sm">
+                    <li>Does it use <code>::geography</code> or <code>ST_Transform</code> (meters, not degrees)?</li>
+                    <li>Does it use <code>ST_DWithin</code> (index) — not bare <code>ST_Distance</code>?</li>
+                    <li>Run it. Does the ranking <strong>match your Step 4 result</strong>?</li>
+                    <li>Ask a follow-up: <em>"add <code>EXPLAIN ANALYZE</code> and confirm the index is used."</em></li>
+                </ol>
+            </div>
+            <div class="caution">
+                <p>If its numbers differ from yours, <strong>you</strong> find out why. That gap-hunting <em>is</em> the skill.</p>
             </div>
 
             <h2 class="text-2xl font-semibold mt-6">A safe AI-assisted workflow</h2>
