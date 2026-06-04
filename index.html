@@ -1023,74 +1023,220 @@
                 <p><strong>The SQL is nearly identical.</strong> DuckDB's <code>spatial</code> extension implements the same <code>ST_*</code> functions. Learn the query once; run it in either engine.</p>
             </div>
 
-            <h2 class="text-2xl font-semibold mt-6">Track A — DuckDB in 60 seconds <span class="track duck">DuckDB</span></h2>
-            <p>The fastest path to running spatial SQL. No server, no accounts.</p>
-            <div class="code-grid">
-                <div>
-                    <p class="text-sm font-semibold mb-1">Option 1 — Python (what we'll use in labs)</p>
-                    <div class="code-container relative">
-                        <pre><code class="language-python">pip install "duckdb>=1.1" "geopandas>=1.0"
+            <h2 class="text-2xl font-semibold mt-6">Track A — DuckDB, step by step <span class="track duck">DuckDB</span></h2>
+            <p>The fastest path to running spatial SQL: no server, no accounts, one extension. Pick the Python flavour (used in our labs) or the standalone CLI — the SQL is identical. Targets <strong>DuckDB&nbsp;1.1+</strong>, which reads and writes GeoParquet natively.</p>
 
-# then, in Python:
-import duckdb
-con = duckdb.connect("riverbend.duckdb")
-con.sql("INSTALL spatial; LOAD spatial;")
-con.sql("SELECT ST_Point(0, 0) AS p;").show()</code></pre>
-                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="workflow-step">
+                <span class="step-num">1</span>
+                <div class="w-full">
+                    <p class="font-semibold">Install DuckDB</p>
+                    <p class="text-sm text-neutral-600 mb-2">Either the Python package (recommended for labs) or the standalone CLI binary. A virtual environment keeps the install isolated.</p>
+                    <div class="code-grid">
+                        <div>
+                            <p class="text-sm font-semibold mb-1">Option 1 — Python <span class="track py">Python</span></p>
+                            <div class="code-container relative">
+                                <pre><code class="language-bash"># create an isolated environment (recommended)
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+
+pip install "duckdb>=1.1" "geopandas>=1.0" pandas
+
+# sanity check the version
+python -c "import duckdb; print(duckdb.__version__)"</code></pre>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold mb-1">Option 2 — CLI binary</p>
+                            <div class="code-container relative">
+                                <pre><code class="language-bash"># macOS (Homebrew)
+brew install duckdb
+
+# Linux / macOS (official install script)
+curl https://install.duckdb.org | sh
+
+# Windows: winget install DuckDB.cli
+duckdb --version           # expect v1.1.x or newer</code></pre>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <p class="text-sm font-semibold mb-1">Option 2 — CLI (great for quick checks)</p>
-                    <div class="code-container relative">
-                        <pre><code class="language-bash"># macOS / Linux
-brew install duckdb        # or download the binary
-duckdb riverbend.duckdb
+            </div>
+
+            <div class="workflow-step">
+                <span class="step-num">2</span>
+                <div class="w-full">
+                    <p class="font-semibold">Open a <em>persistent</em> database &amp; load the spatial extension</p>
+                    <p class="text-sm text-neutral-600 mb-2">Passing a file name (not <code>:memory:</code>) means your tables survive a restart. <code>INSTALL</code> downloads the extension once; <code>LOAD</code> activates it in every new session.</p>
+                    <div class="code-grid">
+                        <div>
+                            <p class="text-sm font-semibold mb-1"><span class="track py">Python</span></p>
+                            <div class="code-container relative">
+                                <pre><code class="language-python">import duckdb
+
+# a file on disk → data persists between runs
+con = duckdb.connect("riverbend.duckdb")
+
+con.sql("INSTALL spatial;")   # one-time download
+con.sql("LOAD spatial;")      # every session
+con.sql("SELECT ST_AsText(ST_Point(-117.4, 33.9));").show()</code></pre>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold mb-1">CLI</p>
+                            <div class="code-container relative">
+                                <pre><code class="language-bash">duckdb riverbend.duckdb       # opens (or creates) the file
 
 -- inside the DuckDB shell:
-INSTALL spatial; LOAD spatial;
+INSTALL spatial;
+LOAD spatial;
 SELECT ST_AsText(ST_Point(-117.4, 33.9));
--- POINT(-117.4 33.9)</code></pre>
+-- POINT (-117.4 33.9)</code></pre>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <span class="step-num">3</span>
+                <div class="w-full">
+                    <p class="font-semibold">(Optional) read remote files directly <span class="track duck">DuckDB</span></p>
+                    <p class="text-sm text-neutral-600 mb-2">The <code>httpfs</code> extension lets DuckDB stream GeoParquet/Parquet straight from a URL or S3 — no download step. We use this for the open-data labs further down.</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">INSTALL httpfs; LOAD httpfs;
+-- now any https:// or s3:// path works as a table source, e.g.
+-- SELECT * FROM 'https://example.org/clinics.parquet' LIMIT 5;</code></pre>
                         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     </div>
                 </div>
             </div>
+
             <div class="lab-box">
                 <div class="lab-head"><span class="lab-tag">Lab 0a</span> Verify DuckDB</div>
-                Run either snippet. If you see a <code>POINT</code> printed, your spatial engine works. ✅
+                Run steps 1–2. If <code>SELECT ST_AsText(ST_Point(-117.4, 33.9))</code> prints <code>POINT (-117.4 33.9)</code>, your spatial engine works. ✅
             </div>
 
-            <h2 class="text-2xl font-semibold mt-6">Track B — Docker PostGIS in one command <span class="track docker">Docker</span></h2>
-            <p>The official image bundles PostgreSQL 18 + PostGIS 3.6. One command, a real server.</p>
-            <div class="code-container relative">
-                <pre><code class="language-bash"># Pull &amp; run a PostGIS server (downloads ~600 MB the first time)
-docker run -d --name almanac-pg \
+            <h2 class="text-2xl font-semibold mt-6">Track B — Docker PostGIS, step by step <span class="track docker">Docker</span></h2>
+            <p>The official <code>postgis/postgis</code> image bundles PostgreSQL&nbsp;18 + PostGIS&nbsp;3.6 — a genuine multi-user server, in a few commands. Install <a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener" class="resource-link">Docker Desktop</a> (macOS/Windows) or Docker Engine (Linux) first, then check it runs: <code>docker --version</code>.</p>
+
+            <div class="workflow-step">
+                <span class="step-num">1</span>
+                <div class="w-full">
+                    <p class="font-semibold">Run a PostGIS server with a persistent volume</p>
+                    <p class="text-sm text-neutral-600 mb-2">The named volume <code>almanac-pgdata</code> keeps your database even if the container is removed and recreated. Downloads ~600&nbsp;MB the first time.</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-bash">docker run -d --name almanac-pg \
   -e POSTGRES_PASSWORD=almanac \
   -e POSTGRES_DB=riverbend \
   -p 5432:5432 \
+  -v almanac-pgdata:/var/lib/postgresql/data \
   postgis/postgis:18-3.6</code></pre>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <p class="text-xs text-neutral-500 mt-1">Apple Silicon: the image is multi-arch and runs natively — no <code>--platform</code> flag needed. If port 5432 is busy, map a different host port, e.g. <code>-p 5433:5432</code>.</p>
+                </div>
             </div>
+
+            <div class="workflow-step">
+                <span class="step-num">2</span>
+                <div class="w-full">
+                    <p class="font-semibold">Wait until the server is ready, then connect with <code>psql</code></p>
+                    <p class="text-sm text-neutral-600 mb-2"><code>pg_isready</code> confirms the database has finished starting before you connect.</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-bash"># is it accepting connections yet?
+docker exec almanac-pg pg_isready -U postgres
+# → /var/run/postgresql:5432 - accepting connections
+
+# open an interactive SQL shell inside the container
+docker exec -it almanac-pg psql -U postgres -d riverbend</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <span class="step-num">3</span>
+                <div class="w-full">
+                    <p class="font-semibold">Enable the PostGIS extension (once per database)</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-sql">CREATE EXTENSION IF NOT EXISTS postgis;
+SELECT postgis_full_version();
+-- POSTGIS="3.6.0" ... GEOS="3.13" PROJ="9.x" ...</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-1">
+                <div class="ai-tip">
+                    <p><strong>Lifecycle:</strong> <code>-d</code> runs it in the background. Pause/resume with <code>docker stop almanac-pg</code> / <code>docker start almanac-pg</code>. <code>docker logs -f almanac-pg</code> tails the server log. Because data lives in the volume, even <code>docker rm</code> won't erase it — only <code>docker volume rm almanac-pgdata</code> does.</p>
+                </div>
+                <div class="caution">
+                    <p><strong>Teaching only:</strong> a hard-coded password and an open port are fine on your laptop — never on a shared or internet-facing host. Use secrets and restricted roles in production.</p>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold mt-5">Connect from your own tools (host side) <span class="track docker">Docker</span></h3>
+            <p class="text-sm text-neutral-600">Because we published port <code>5432</code>, any client on your laptop can reach the server at <code>localhost</code> — a host <code>psql</code>, a Python/R script, or a GUI like <a href="https://dbeaver.io/" target="_blank" rel="noopener" class="resource-link">DBeaver</a> / <a href="https://www.pgadmin.org/" target="_blank" rel="noopener" class="resource-link">pgAdmin</a> / <a href="https://www.postgresql.org/docs/current/app-psql.html" target="_blank" rel="noopener" class="resource-link">psql</a>.</p>
             <div class="code-grid">
                 <div>
-                    <p class="text-sm font-semibold mb-1">Connect with <code>psql</code> (inside the container)</p>
+                    <p class="text-sm font-semibold mb-1">Host <code>psql</code> via a connection URL</p>
                     <div class="code-container relative">
-                        <pre><code class="language-bash">docker exec -it almanac-pg \
-  psql -U postgres -d riverbend
-
--- Turn on PostGIS in this database (once)
-CREATE EXTENSION IF NOT EXISTS postgis;
-SELECT postgis_full_version();</code></pre>
+                        <pre><code class="language-bash">psql "postgresql://postgres:almanac@localhost:5432/riverbend"</code></pre>
                         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     </div>
                 </div>
                 <div>
-                    <div class="ai-tip">
-                        <p><strong>Tip:</strong> <code>-d</code> runs it in the background. Stop/restart with <code>docker stop almanac-pg</code> / <code>docker start almanac-pg</code>. Your data persists in the container until you <code>docker rm</code> it.</p>
-                    </div>
-                    <div class="caution">
-                        <p><strong>Teaching only:</strong> a hard-coded password and open port are fine on your laptop — never on a shared or internet-facing host.</p>
+                    <p class="text-sm font-semibold mb-1">GUI client fields</p>
+                    <div class="code-container relative">
+                        <pre><code class="language-text">Host:     localhost
+Port:     5432
+Database: riverbend
+User:     postgres
+Password: almanac</code></pre>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     </div>
                 </div>
+            </div>
+
+            <h3 class="text-xl font-semibold mt-5">Troubleshooting <span class="track docker">Docker</span></h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>bind: address already in use</code> on 5432</td>
+                            <td>A local PostgreSQL (or an old container) already owns the port.</td>
+                            <td>Re-run with a different host port: <code>-p 5433:5432</code>, then connect on <code>5433</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Cannot connect to the Docker daemon</code></td>
+                            <td>Docker Desktop / Engine isn't running.</td>
+                            <td>Start Docker Desktop (or <code>sudo systemctl start docker</code>) and retry.</td>
+                        </tr>
+                        <tr>
+                            <td><code>password authentication failed</code></td>
+                            <td>Wrong password, or a stale volume from an earlier run with a different one.</td>
+                            <td>Use <code>almanac</code>, or reset: <code>docker rm -f almanac-pg &amp;&amp; docker volume rm almanac-pgdata</code>, then re-run step&nbsp;1.</td>
+                        </tr>
+                        <tr>
+                            <td><code>The container name "/almanac-pg" is already in use</code></td>
+                            <td>A container with that name exists.</td>
+                            <td>Reuse it with <code>docker start almanac-pg</code>, or remove it: <code>docker rm -f almanac-pg</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>FATAL: the database system is starting up</code></td>
+                            <td>You connected before initialization finished.</td>
+                            <td>Wait for <code>docker exec almanac-pg pg_isready -U postgres</code> to report <em>accepting connections</em>.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="lab-box">
                 <div class="lab-head"><span class="lab-tag">Lab 0b</span> Prove PostGIS is alive <span class="track sql">SQL</span></div>
@@ -1190,6 +1336,112 @@ FROM generate_series(0,5) d;</code></pre>
             <div class="lab-box">
                 <div class="lab-head"><span class="lab-tag">Lab 0c</span> Create the tables</div>
                 Run all three blocks. Then: <code>SELECT count(*) FROM blocks;</code> — expect ~323 rows.
+            </div>
+
+            <h2 class="text-2xl font-semibold mt-6">Real sample datasets to explore interactively <span class="badge-new">New</span></h2>
+            <p>The synthetic Riverbend tables above are perfect for the case study because everyone has identical data. But once you want to <em>play</em>, nothing beats real spatial data. Below are battle-tested, openly-licensed datasets used across the GIS world — each with a copy-and-run recipe for PostGIS or DuckDB.</p>
+
+            <div class="table-container mt-3">
+                <table>
+                    <thead>
+                        <tr><th>Dataset</th><th>What's in it</th><th>Format / size</th><th>Best engine</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>PostGIS "Intro" NYC data</strong></td>
+                            <td>Census blocks, streets, subway stations, neighborhoods + sociodemographics. The canonical teaching set.</td>
+                            <td>Shapefiles, ~25&nbsp;MB</td>
+                            <td>PostGIS</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Natural Earth</strong></td>
+                            <td>Global countries, states, cities, rivers, coastlines at 1:10m / 1:50m / 1:110m.</td>
+                            <td>Shapefile / GeoPackage, public domain</td>
+                            <td>PostGIS or DuckDB</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Overture Maps</strong></td>
+                            <td>Global places (POIs), buildings, transportation, admin boundaries.</td>
+                            <td>GeoParquet on S3, billions of rows</td>
+                            <td>DuckDB</td>
+                        </tr>
+                        <tr>
+                            <td><strong>US Census TIGER/Line</strong></td>
+                            <td>US states, counties, tracts, roads — the backbone of US public-health geography.</td>
+                            <td>Shapefile / GeoParquet</td>
+                            <td>PostGIS or DuckDB</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OpenStreetMap extracts</strong></td>
+                            <td>Roads, buildings, amenities (clinics, pharmacies) for any region.</td>
+                            <td>PBF (via Geofabrik)</td>
+                            <td>PostGIS (<code>osm2pgsql</code>)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="text-xl font-semibold mt-5">Recipe 1 — Load the official PostGIS NYC workshop data <span class="track docker">PostGIS</span></h3>
+            <p class="text-sm text-neutral-600">The <a href="https://postgis.net/workshops/postgis-intro/" target="_blank" rel="noopener" class="resource-link">Introduction to PostGIS</a> workshop ships four NYC shapefiles. Load them with <code>shp2pgsql</code> (bundled with PostGIS, so it already exists inside the container).</p>
+            <div class="code-container relative">
+                <pre><code class="language-bash"># 1. Download &amp; unzip the workshop data bundle (on your laptop)
+curl -L -o nyc_data.zip \
+  https://s3.cleverelephant.ca/postgis-workshop-2020.zip
+unzip nyc_data.zip            # → data/nyc_*.shp
+
+# 2. Copy the shapefiles into the running container
+docker cp data almanac-pg:/tmp/nyc
+
+# 3. Convert one shapefile to SQL and pipe it straight into the DB
+#    -s 26918 = NY State Plane (UTM 18N);  -I builds a spatial index
+docker exec -i almanac-pg bash -c \
+  "shp2pgsql -s 26918 -I /tmp/nyc/nyc_neighborhoods nyc_neighborhoods \
+   | psql -U postgres -d riverbend"</code></pre>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p class="text-xs text-neutral-500 mt-1">Repeat step&nbsp;3 for <code>nyc_census_blocks</code>, <code>nyc_streets</code>, and <code>nyc_subway_stations</code>. Then <code>SELECT name FROM nyc_neighborhoods LIMIT 5;</code> to confirm.</p>
+
+            <h3 class="text-xl font-semibold mt-5">Recipe 2 — Stream Overture Maps places straight into DuckDB <span class="track duck">DuckDB</span></h3>
+            <p class="text-sm text-neutral-600">No download, no import: DuckDB reads the GeoParquet on S3 and the <code>bbox</code> filter means only the bytes for your area of interest are fetched. Great for pulling real clinics/pharmacies as context for a health analysis.</p>
+            <div class="code-container relative">
+                <pre><code class="language-sql">INSTALL spatial; LOAD spatial;
+INSTALL httpfs;  LOAD httpfs;
+
+-- Health-related POIs near downtown Los Angeles.
+-- Check docs.overturemaps.org for the current release tag.
+SELECT id,
+       names.primary           AS name,
+       categories.primary      AS category,
+       ST_AsText(geometry)     AS location
+FROM read_parquet(
+  's3://overturemaps-us-west-2/release/2025-04-23.0/theme=places/type=place/*',
+  filename = true, hive_partitioning = 1)
+WHERE categories.primary IN ('hospital','pharmacy','clinic')
+  AND bbox.xmin BETWEEN -118.30 AND -118.20
+  AND bbox.ymin BETWEEN   34.00 AND   34.10
+LIMIT 20;</code></pre>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p class="text-xs text-neutral-500 mt-1">Overture publishes a new release roughly monthly; swap <code>2025-04-23.0</code> for the latest tag from the <a href="https://docs.overturemaps.org/getting-data/duckdb/" target="_blank" rel="noopener" class="resource-link">Overture&nbsp;→&nbsp;DuckDB</a> docs.</p>
+
+            <h3 class="text-xl font-semibold mt-5">Recipe 3 — Import Natural Earth with <code>ogr2ogr</code> <span class="track docker">PostGIS</span></h3>
+            <p class="text-sm text-neutral-600"><code>ogr2ogr</code> (part of GDAL) is the universal converter — it reads almost any spatial format and writes directly to PostGIS. Here we load global country polygons.</p>
+            <div class="code-container relative">
+                <pre><code class="language-bash"># Needs GDAL on your host:  brew install gdal  /  apt install gdal-bin
+ogr2ogr -f PostgreSQL \
+  PG:"host=localhost port=5432 dbname=riverbend user=postgres password=almanac" \
+  /vsizip/vsicurl/https://naturalearth.s3.amazonaws.com/110m_cultural/ne_110m_admin_0_countries.zip \
+  -nln ne_countries -nlt PROMOTE_TO_MULTI -lco GEOMETRY_NAME=geom -overwrite</code></pre>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p class="text-xs text-neutral-500 mt-1"><code>/vsizip/vsicurl/</code> is GDAL's virtual filesystem: it streams and unzips the remote shapefile in one shot — no manual download. The same trick loads Natural Earth straight into DuckDB via <code>ST_Read()</code>.</p>
+
+            <div class="ai-tip mt-2">
+                <p><strong>Don't have GDAL or the right URL handy?</strong> This is exactly where the AICopilot from Part&nbsp;VIII shines — paste the dataset name and ask it to write the <code>ogr2ogr</code>/<code>shp2pgsql</code>/<code>read_parquet</code> command for your engine, then verify the row count.</p>
+            </div>
+            <div class="lab-box">
+                <div class="lab-head"><span class="lab-tag">Lab 0d</span> Bring in real data <span class="track sql">SQL</span></div>
+                Pick one recipe and load it. Then run <code>SELECT count(*)</code> on the new table and <code>SELECT ST_SRID(geom) FROM &lt;table&gt; LIMIT 1;</code> — note which SRID it arrived in (you'll often need to <code>ST_Transform</code> it to match your other layers).
             </div>
         </section>
 
@@ -2346,6 +2598,16 @@ Write ONE query: per district, the % of block population within 5 km of any clin
                 <li>Overture Maps (open base data): <a href="https://overturemaps.org" target="_blank" rel="noopener" class="resource-link">overturemaps.org</a></li>
                 <li>Cloud-Native Geospatial Forum: <a href="https://cloudnativegeo.org" target="_blank" rel="noopener" class="resource-link">cloudnativegeo.org</a></li>
                 <li>Spatial SQL reference (PostGIS functions): <a href="https://postgis.net/docs/reference.html" target="_blank" rel="noopener" class="resource-link">postgis.net/docs/reference.html</a></li>
+            </ul>
+
+            <h3 class="text-xl font-semibold mt-4">Sample &amp; test datasets (to practice on): <span class="badge-new">New</span></h3>
+            <ul class="list-disc list-inside ml-4 my-2">
+                <li>PostGIS "Intro" NYC workshop data: <a href="https://postgis.net/workshops/postgis-intro/" target="_blank" rel="noopener" class="resource-link">postgis.net &rarr; workshops</a></li>
+                <li>Natural Earth (public-domain global vectors): <a href="https://www.naturalearthdata.com/downloads/" target="_blank" rel="noopener" class="resource-link">naturalearthdata.com</a></li>
+                <li>Overture Maps via DuckDB: <a href="https://docs.overturemaps.org/getting-data/duckdb/" target="_blank" rel="noopener" class="resource-link">docs.overturemaps.org</a></li>
+                <li>US Census TIGER/Line (US geography): <a href="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html" target="_blank" rel="noopener" class="resource-link">census.gov &rarr; TIGER/Line</a></li>
+                <li>OpenStreetMap regional extracts: <a href="https://download.geofabrik.de/" target="_blank" rel="noopener" class="resource-link">download.geofabrik.de</a></li>
+                <li>Source GeoJSON for quick tests (US states, counties): <a href="https://geojson.org" target="_blank" rel="noopener" class="resource-link">geojson.org</a></li>
             </ul>
 
             <h3 class="text-xl font-semibold mt-4">Learning &amp; Doing GIS with AI: <span class="badge-new">New</span></h3>
