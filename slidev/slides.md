@@ -42,7 +42,8 @@ Press <kbd>→</kbd> / <kbd>Space</kbd> to advance
 </div>
 
 <div class="abs-bl m-6 text-xs opacity-60">
-<a href="/" target="_self">← Interactive lecture</a>
+<a href="/" target="_self">← Interactive lecture</a> &nbsp;·&nbsp;
+<a href="/interactive/" target="_blank">Live data explorer →</a>
 </div>
 
 <!--
@@ -1713,6 +1714,12 @@ We'll answer our running question in **five steps**, each a short lab. By the en
 underserved relative to population?" Every step is runnable in PostGIS <em>or</em> DuckDB.
 </div>
 
+<div class="callout ai-tip mt-2 text-sm">
+<strong>🌐 Live companion:</strong> the same five steps run on <strong>128,471 real Korean health facilities</strong>
+at <a href="/interactive/" target="_blank"><code>postgis.son.do/interactive</code></a> — buffers, spatial joins, and
+an in-browser DuckDB console, no setup.
+</div>
+
 ---
 
 # Step 1 — inventory & sanity-check <span class="track sql">SQL</span>
@@ -1944,6 +1951,63 @@ WHERE ST_DWithin(
 <div class="callout takeaway mt-3">
 <strong>Key takeaway:</strong> PostGIS answers sophisticated spatial questions efficiently —
 and once you know the handful of core predicates, new questions are recombinations of the same moves.
+</div>
+
+---
+
+# From Riverbend to the real world <span class="badge-new">Live data</span>
+
+Riverbend is synthetic on purpose — but the moves you just learned run unchanged on a **real national database**. Our companion explorer is wired to a live, read-only PostGIS of Korean public-health GIS.
+
+<div class="grid grid-cols-2 gap-5 mt-3">
+
+<div>
+
+<div class="text-sm">
+
+| Real layer | Rows | Geometry |
+|---|---|---|
+| Health facilities (`hospitals`) | **128,471** | Point |
+| Districts / provinces | 250 / 17 | MultiPolygon |
+| Air-quality monitoring sites | 577 | Point |
+| Bus stops | 579,831 | Point |
+
+</div>
+
+<div class="text-xs opacity-70 mt-1">
+Stored in <strong>SRID 5179</strong> (Korea Central Belt, in <em>metres</em>) — already projected, so
+distances are honest without a cast. Tens of GB across ~90 tables.
+</div>
+
+</div>
+
+<div>
+
+The **points-in-polygons** join from Part IV, on real facilities:
+
+```sql
+SELECT s.adm_nm AS province, count(*) AS hospitals
+FROM "SIDO_BORDERS" s
+JOIN hospitals h ON ST_Contains(s.geometry, h.geom)
+WHERE s.year = 2022 AND h.s_type = '종합병원'
+GROUP BY s.adm_nm ORDER BY 2 DESC;
+```
+
+<div class="text-sm mt-1">
+
+Real result — general hospitals by province:
+**경기도 76 · 서울 64 · 전남 57 · 광주 54 · 인천 47 …**
+
+</div>
+
+</div>
+
+</div>
+
+<div class="callout ai-tip mt-3">
+<strong>🌐 Try it live now:</strong> open <a href="/interactive/" target="_blank"><code>postgis.son.do/interactive</code></a> —
+toggle real layers, drop a buffer to count clinics within 5 km, and run this exact spatial join in an
+in-browser DuckDB console. <strong>No install.</strong> The same <code>ST_*</code> SQL, on real data.
 </div>
 
 ---
@@ -2538,6 +2602,10 @@ spatial SQL you learned today carries across the whole modern, AI-assisted ecosy
 - Clay — [madewithclay.org](https://madewithclay.org)
 - `segment-geospatial` — [samgeo.gishub.org](https://samgeo.gishub.org)
 - `pgvector` — [github.com/pgvector/pgvector](https://github.com/pgvector/pgvector)
+
+**This course** <span class="badge-new">Hands-on</span>
+- Live data explorer — [postgis.son.do/interactive](/interactive/)
+- MapLibre · Turf · DuckDB-WASM · real Korea GIS
 
 </div>
 

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Explorer · The PostGIS Almanac</title>
+  <meta name="description" content="Explore real Korean public-health GIS data — hospitals, boundaries, air-quality sites — with live buffers, spatial joins, and an in-browser DuckDB spatial SQL console." />
+
+  <!-- MapLibre GL JS -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <!-- Turf.js (client-side geometry) -->
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.1.0/turf.min.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+  <!-- ================= SIDEBAR ================= -->
+  <aside id="sidebar">
+    <div class="masthead">
+      <div class="kicker">The PostGIS Almanac · Hands-on</div>
+      <h1>Interactive Spatial Explorer</h1>
+      <p>Real Korean public-health GIS — visualised in your browser.</p>
+      <a class="back" href="/">← Lecture home</a> &nbsp;·&nbsp;
+      <a class="back" href="/slides/">Slides →</a>
+      <div class="stat-row" id="stats"><!-- filled from data/meta.json --></div>
+    </div>
+
+    <!-- ---- Layers ---- -->
+    <section class="panel" id="panel-layers">
+      <h2>Layers</h2>
+      <div class="panel-body" id="layer-list"><!-- filled by app.js --></div>
+    </section>
+
+    <!-- ---- Buffer / proximity tool ---- -->
+    <section class="panel" id="panel-buffer">
+      <h2>Buffer &amp; proximity</h2>
+      <div class="panel-body">
+        <p class="hint">A service-area question, the visual way: drop a point, grow a buffer,
+          and count the facilities inside it — exactly what <code>ST_Buffer</code> +
+          <code>ST_DWithin</code> do in SQL.</p>
+
+        <div class="btn-row">
+          <button class="btn" id="pick-center">📍 Pick centre on map</button>
+          <button class="btn ghost" id="clear-buffer">Clear</button>
+        </div>
+
+        <div class="field">
+          <label>Radius</label>
+          <div class="radius-row">
+            <input type="range" id="radius" min="200" max="10000" step="100" value="5000" />
+            <span class="radius-val" id="radius-val">5 000 m</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Count features inside the buffer</label>
+          <select id="buffer-target">
+            <option value="hospitals">Hospitals &amp; clinics</option>
+            <option value="air_sites">Air-quality sites</option>
+            <option value="rail_stations">Rail stations</option>
+            <option value="airports">Airports</option>
+          </select>
+        </div>
+
+        <div class="result-card" id="buffer-result" style="display:none"></div>
+        <pre class="sql" id="buffer-sql" style="display:none"></pre>
+      </div>
+    </section>
+
+    <!-- ---- DuckDB SQL console ---- -->
+    <section class="panel collapsed" id="panel-sql">
+      <h2>Spatial SQL console <span style="font-weight:400;text-transform:none;letter-spacing:0">· DuckDB-WASM</span></h2>
+      <div class="panel-body">
+        <p class="hint">The <em>same</em> <code>ST_*</code> SQL from the lecture, running entirely
+          in your browser via DuckDB + the <code>spatial</code> extension — no server, no install.
+          Tables: <code>hospitals</code>, <code>provinces</code>, <code>districts</code>,
+          <code>air_sites</code>, <code>rail_stations</code>, <code>airports</code>.</p>
+
+        <div class="example-links" id="examples"><!-- filled by app.js --></div>
+
+        <textarea id="sql-input" spellcheck="false">SELECT category, count(*) AS n
+FROM hospitals
+GROUP BY category
+ORDER BY n DESC;</textarea>
+
+        <div class="btn-row">
+          <button class="btn" id="run-sql">▶ Run query</button>
+          <button class="btn ghost" id="map-sql" title="Plot a query that returns a geom column on the map">Plot result</button>
+        </div>
+        <div class="duck-status" id="duck-status">DuckDB will start on first run…</div>
+        <div id="sql-result"></div>
+      </div>
+    </section>
+
+    <!-- ---- Live PostGIS note ---- -->
+    <section class="panel collapsed" id="panel-live">
+      <h2>Connect to a live PostGIS</h2>
+      <div class="panel-body">
+        <p class="hint">This explorer ships a <strong>simplified snapshot</strong> of the teaching
+          database so it runs on a static host with zero setup. A browser cannot open a raw
+          PostgreSQL connection directly, so to query a <em>live</em> database you point a small
+          read-only proxy at it and query through that.</p>
+        <p class="hint">The repo's <code>interactive/export/export.sh</code> shows the exact PostGIS
+          SQL used to build these layers — run it against your own <code>DB_URL</code> to refresh
+          the snapshot, or adapt it to add tables.</p>
+        <pre class="sql">set -a &amp;&amp; source .env &amp;&amp; set +a   <span class="kw"># provides DB_URL</span>
+cd interactive/export &amp;&amp; ./export.sh</pre>
+      </div>
+    </section>
+  </aside>
+
+  <!-- ================= MAP ================= -->
+  <div id="map">
+    <div id="crosshair-note">Click the map to set the buffer centre…</div>
+    <div class="map-badge" id="map-badge">Loading real GIS layers…</div>
+    <div class="loading-veil" id="veil">
+      <div class="spinner"></div>
+      <div>Loading real Korean GIS layers…</div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
