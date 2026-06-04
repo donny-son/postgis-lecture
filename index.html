@@ -846,6 +846,7 @@
             </button>
         </div>
         <a href="/slides/" class="slides-link block py-2 px-4 mb-3 rounded-md text-center" style="border:1px solid var(--color-clay-soft);color:var(--color-clay-deep);font-weight:600;text-decoration:none;">▶ View as slide deck</a>
+        <a href="/interactive/" class="slides-link block py-2 px-4 mb-3 rounded-md text-center" style="border:1px solid var(--color-green-soft, #b7c79f);background:var(--color-green-tint, #eef3e4);color:var(--color-green-deep, #2f5130);font-weight:600;text-decoration:none;">🗺️ Live data explorer <span class="badge-new">Hands-on</span></a>
         <p class="toc-label hidden md:block">Table of Contents</p>
         <nav>
             <a href="#overview" class="nav-link block py-2 px-4 rounded-md" onclick="closeMobileMenu()"><span class="nav-num">I</span><span class="nav-label">Overview</span></a>
@@ -871,6 +872,9 @@
             </div>
             <div class="ai-tip">
                 <p><strong>📅 2026 revamp:</strong> This edition updates the material for the current geospatial ecosystem (PostGIS 3.6, PostgreSQL 18, GeoParquet, DuckDB, <code>psycopg</code> v3, GeoPandas 1.x) and adds a hands-on guide to <strong>learning and doing GIS with generative AI</strong>. New and updated content is marked with a <span class="badge-new">New</span> badge.</p>
+            </div>
+            <div class="ai-tip">
+                <p><strong>🗺️ New — Live data explorer <span class="badge-new">Hands-on</span>:</strong> a companion app at <a href="/interactive/" class="resource-link"><strong>postgis.son.do/interactive</strong></a> wired to a real, read-only PostGIS of Korean public-health GIS — <strong>128,471 hospitals &amp; clinics</strong>, district/province boundaries, air-quality sites, and more. Toggle layers on a live map, drop a <strong>buffer</strong> to count clinics within 5&nbsp;km, and run the lecture's <code>ST_*</code> spatial SQL in an <strong>in-browser DuckDB console</strong> — no install. <a href="/interactive/" class="resource-link">Open the explorer →</a></p>
             </div>
 
             <h2 class="text-2xl font-semibold mt-6">How to follow along</h2>
