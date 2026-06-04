@@ -1924,6 +1924,155 @@ print(df.head(1))     # -> the most-populated district</code></pre>
                 </div>
             </div>
 
+            <h2 class="text-2xl font-semibold mt-6">PostGIS vs. DuckDB — how they really differ <span class="badge-new">New</span></h2>
+            <p>Because both speak <code>ST_*</code> spatial SQL, it's tempting to treat them as interchangeable. They aren't. They are <strong>architecturally opposite tools</strong> that happen to share a query language — and knowing the difference tells you which one to reach for. The one-line version: <strong>PostGIS is a database you connect to; DuckDB is a library you run inside your script.</strong></p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold"><span class="track docker">PostGIS</span> A spatial <em>system of record</em></h4>
+                    <ul class="list-disc list-inside ml-4 my-2 text-sm text-neutral-600">
+                        <li><strong>Client–server</strong>: a long-running PostgreSQL process many people connect to at once.</li>
+                        <li><strong>Row-oriented + MVCC</strong>: built for lots of concurrent reads <em>and</em> writes, transactions, and live editing.</li>
+                        <li><strong>Durable & governed</strong>: roles, permissions, constraints, backups — a single authoritative source of truth.</li>
+                        <li><strong>The deepest spatial toolbox</strong>: geography type, raster, topology, <code>ST_AsMVT</code> tiles, hundreds of mature functions.</li>
+                    </ul>
+                    <p class="text-xs text-neutral-500">Shines when the data is shared, edited, and long-lived.</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg border border-neutral-300">
+                    <h4 class="text-lg font-semibold"><span class="track duck">DuckDB</span> A spatial <em>analytics engine</em></h4>
+                    <ul class="list-disc list-inside ml-4 my-2 text-sm text-neutral-600">
+                        <li><strong>In-process / embedded</strong>: a library inside your Python/R/CLI session — "SQLite for analytics," no server.</li>
+                        <li><strong>Columnar + vectorized</strong>: tears through analytical scans, aggregations, and joins over huge tables.</li>
+                        <li><strong>Files-first</strong>: queries GeoParquet/CSV/GeoJSON <em>in place</em> on disk or in S3 — often no import step at all.</li>
+                        <li><strong>Lean & fast to start</strong>: <code>pip install</code>, load <code>spatial</code>, go; auto-builds spatial indexes at query time.</li>
+                    </ul>
+                    <p class="text-xs text-neutral-500">Shines for ad-hoc, single-analyst, big-file analysis.</p>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold mt-5">At a glance: the same query language, opposite engines</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dimension</th>
+                            <th><span class="track docker">PostGIS</span></th>
+                            <th><span class="track duck">DuckDB + spatial</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Architecture</strong></td>
+                            <td>Client–server; persistent database process</td>
+                            <td>Embedded, in-process library (like SQLite)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Workload sweet spot</strong></td>
+                            <td>Transactional (OLTP) + serving apps & many users</td>
+                            <td>Analytical (OLAP) scans, aggregations, joins</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Storage model</strong></td>
+                            <td>Row-oriented heap tables</td>
+                            <td>Columnar, vectorized execution</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Concurrency</strong></td>
+                            <td>Many concurrent readers <em>and</em> writers (MVCC)</td>
+                            <td>Single process; great parallel reads, one writer</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Persistence</strong></td>
+                            <td>Durable, server-managed database</td>
+                            <td>One <code>.duckdb</code> file or purely in-memory</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Getting data in</strong></td>
+                            <td>Load/import into tables first</td>
+                            <td>Query files in place (disk, URL, S3) — no import</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spatial index</strong></td>
+                            <td>Persistent GiST R-Tree you <code>CREATE INDEX</code></td>
+                            <td>R-Tree built automatically at query time</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>geography</code> type</strong></td>
+                            <td>Yes — true geodetic metres on the spheroid</td>
+                            <td>No native type — project, or use sphere helpers</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Function library</strong></td>
+                            <td>Hundreds; + raster, topology, 3D, vector tiles</td>
+                            <td>Growing GEOS-backed subset; vector-focused</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Transactions</strong></td>
+                            <td>Full ACID, multi-statement, constraints, roles</td>
+                            <td>ACID on its own file; analytics-first, lighter</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Setup cost</strong></td>
+                            <td>Install/run a server (or Docker)</td>
+                            <td><code>pip install duckdb</code> — seconds</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Role in the stack</strong></td>
+                            <td>The durable, shared source of truth</td>
+                            <td>The fast analytical scratchpad / ETL engine</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="text-xl font-semibold mt-5">Same spatial SQL, a few dialect differences to watch <span class="track sql">SQL</span></h3>
+            <p class="text-sm text-neutral-600">The core predicates (<code>ST_Intersects</code>, <code>ST_Contains</code>, <code>ST_DWithin</code>, <code>ST_Buffer</code>) are byte-for-byte the same. The differences are mostly at the edges — point construction, the <code>geography</code> type, and how you produce rows.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                <div class="code-container relative">
+                    <p class="text-sm font-semibold mb-1"><span class="track docker">PostGIS</span></p>
+                    <pre><code class="language-sql">-- Stamp an explicit SRID on a point
+ST_SetSRID(ST_MakePoint(-117.4, 33.9), 4326)
+
+-- True metres via the geography type
+ST_DWithin(a.geom::geography,
+           b.geom::geography, 5000)
+
+-- Generate a grid of rows
+SELECT * FROM generate_series(0,18) gx,
+              generate_series(0,16) gy;
+
+-- Persistent spatial index (you create it)
+CREATE INDEX ON blocks USING GIST (geom);</code></pre>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-container relative">
+                    <p class="text-sm font-semibold mb-1"><span class="track duck">DuckDB + spatial</span></p>
+                    <pre><code class="language-sql">-- ST_Point already takes (x, y); SRID is metadata-light
+ST_Point(-117.4, 33.9)
+
+-- No geography type: project to metres first…
+ST_DWithin(ST_Transform(a.geom,'EPSG:4326','EPSG:32611'),
+           ST_Transform(b.geom,'EPSG:4326','EPSG:32611'), 5000)
+-- …or measure on a sphere: ST_Distance_Sphere(a, b)
+
+-- range() in a cross join instead of generate_series
+SELECT * FROM range(0,19) t(gx),
+              range(0,17) u(gy);
+
+-- No CREATE INDEX needed — R-Tree is automatic
+SELECT count(*) FROM blocks;            -- read files too:
+SELECT count(*) FROM 'blocks.parquet';</code></pre>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+            </div>
+            <div class="caution mt-3">
+                <p><strong>The two gotchas that bite most often:</strong> (1) DuckDB has <em>no <code>geography</code> type</em> — for real metres you must <code>ST_Transform</code> to a projected CRS (e.g. the right UTM zone) or use <code>ST_Distance_Sphere</code>; a bare distance on lon/lat is in degrees. (2) <code>generate_series</code> as a row source behaves differently — reach for <code>range()</code> in DuckDB. When in doubt, ask an AI to translate a query between the two and then verify (Part VIII).</p>
+            </div>
+
+            <div class="ai-tip mt-3">
+                <p><strong>Better together, not either/or:</strong> a common 2026 pattern is DuckDB for the heavy lifting — scan a 50&#8209;million&#8209;row GeoParquet file, filter and aggregate to a tidy result — then write that result <em>into</em> PostGIS as the shared, governed table everyone queries and maps. With <code>pg_duckdb</code> (a Postgres extension) or DuckDB's <code>postgres</code> extension, one can even reach into the other live.</p>
+            </div>
+
             <h2 class="text-2xl font-semibold mt-6">Cloud-native geospatial formats</h2>
             <p>The "shapefile era" is fading. Modern formats are designed for the cloud, for big data, and for streaming only the bytes you need.</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
