@@ -41,6 +41,10 @@ css: unocss
 Press <kbd>→</kbd> / <kbd>Space</kbd> to advance
 </div>
 
+<div class="abs-bl m-6 text-xs opacity-60">
+<a href="/" target="_self">← Interactive lecture</a>
+</div>
+
 <!--
 Speaker note: This is a ~2-hour hands-on lecture for public-health researchers who
 know their domain but may be newer to databases and code. Goals: (1) introduce the

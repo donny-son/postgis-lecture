@@ -1,0 +1,69 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Allow this workflow to deploy to Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one concurrent deployment; don't cancel an in-progress run
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: slidev/package-lock.json
+
+      - name: Install Slidev dependencies
+        working-directory: slidev
+        run: npm ci
+
+      # The site is served from the custom domain https://postgis.son.do/
+      # so the deck lives at /slides/.
+      - name: Build Slidev deck
+        working-directory: slidev
+        run: npm run build -- --base /slides/ --out dist
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          # Root interactive lecture
+          cp index.html _site/
+          cp tokens.css _site/
+          # Preserve the custom domain on GitHub Pages
+          echo 'postgis.son.do' > _site/CNAME
+          # Slidev web deck under /slides/
+          mkdir -p _site/slides
+          cp -r slidev/dist/. _site/slides/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
