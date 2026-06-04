@@ -13,6 +13,9 @@ info: |
 class: text-center
 highlighter: shiki
 lineNumbers: false
+# Hash routing so deep links (e.g. /slides/#/2) work on GitHub Pages,
+# which has no SPA fallback for history-mode paths like /slides/2.
+routerMode: hash
 drawings:
   persist: false
 transition: slide-left
